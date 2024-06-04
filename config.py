@@ -3,7 +3,8 @@ import os
 
 config_path = "./config.ini" 
 
-senformubin
+if not os.path.exists(config_path):
+    raise FileNotFoundError(f"config not found at {config_path}")
 
 config = configparser.ConfigParser()
 
@@ -12,7 +13,7 @@ try:
         config.read_file(configfile)
 except FileNotFoundError:
     print("config.init not found.")
-    raise FileNotFoundError("config not found. at {config_path}")
+    raise FileNotFoundError("config not found at {config_path}")
 except Exception as e:
     raise e
 

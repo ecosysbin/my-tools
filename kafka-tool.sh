@@ -23,12 +23,15 @@ cd kafka_2.12-2.5.0
 
 # topic列表
 ./bin/kafka-topics.sh --list --zookeeper 10.220.9.91:2181
+# 新版本kafka 3
+./bin/kafka-topics.sh --list --bootstrap-server 10.220.9.91:9092
 
 # topic 详情
 ./bin/kafka-topics.sh --describe --zookeeper 10.220.9.91:2181 --topic test1
 
 # 生产
 ./bin/kafka-console-producer.sh --broker-list 10.220.9.91:9092 --topic test1
-
+./kafka-console-producer.sh --broker-list localhost:9092 --topic test
 # 消费
 ./bin/kafka-console-consumer.sh --bootstrap-server 10.220.9.91:9092 --topic test1 --from-beginning
+./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning

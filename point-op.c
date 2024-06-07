@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+// 定义结构体别名
 typedef struct student student_def;
 
 struct student

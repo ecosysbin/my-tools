@@ -12,6 +12,9 @@ cd kafka_2.12-2.5.0
 # 注:若需要外部访问  一定需要配置listeners   默认为本机名，跨机器无法解析主机名则无法访问，主机外访问配置ip或域名, 默认是主机名跨主机访问会解析出错。配置域名时需要外部也能正常解析
 # listeners=PLAINTEXT://10.220.9.91:9092
 
+# 安装依赖包
+# pip install confluent_kafka
+# export PYTHONPATH=/root/anaconda3/lib/python3.11/site-packages:$PYTHONPATH
 # 启动zookeeper
 ./bin/zookeeper-server-start.sh -daemon ./config/zookeeper.properties
 # 启动kafka
@@ -24,14 +27,15 @@ cd kafka_2.12-2.5.0
 # topic列表
 ./bin/kafka-topics.sh --list --zookeeper 10.220.9.91:2181
 # 新版本kafka 3
-./bin/kafka-topics.sh --list --bootstrap-server 10.220.9.91:9092
+./bin/kafka-topics.sh --list --bootstrap-server localhost:9092
 
 # topic 详情
 ./bin/kafka-topics.sh --describe --zookeeper 10.220.9.91:2181 --topic test1
-
+# 新版本kafka 3
+./bin/kafka-topics.sh --describe --bootstrap-server localhost:9092 --topic test
 # 生产
 ./bin/kafka-console-producer.sh --broker-list 10.220.9.91:9092 --topic test1
-./kafka-console-producer.sh --broker-list localhost:9092 --topic test
+./kafka-console-producer.sh --broker-list 10.220.9.91:9092 --topic test
 # 消费
 ./bin/kafka-console-consumer.sh --bootstrap-server 10.220.9.91:9092 --topic test1 --from-beginning
-./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning
+./kafka-console-consumer.sh --bootstrap-server 10.220.9.91:9092 --topic test --from-beginning

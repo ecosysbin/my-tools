@@ -17,11 +17,12 @@ func Product() {
 
 	// 初始化一个kafka的writer实例，用于发送消息
 	writer := kafka.NewWriter(kafka.WriterConfig{
-		Brokers:      []string{brokerAddress},
-		Topic:        topic,
-		BatchTimeout: 200 * time.Millisecond,
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 10 * time.Second,
+		Brokers:  []string{brokerAddress},
+		Topic:    topic,
+		Balancer: myBalance,
+		// BatchTimeout: 200 * time.Millisecond,
+		// ReadTimeout:  10 * time.Second,
+		// WriteTimeout: 10 * time.Second,
 		// 根据需要调整其他配置，例如批量大小、超时时间等
 	})
 
@@ -41,4 +42,8 @@ func Product() {
 	// 输出结果并关闭writer
 	fmt.Println("Message sent successfully")
 	writer.Close()
+}
+
+var myBalance kafka.BalancerFunc = func(msg kafka.Message, partitions ...int) int {
+	return 0
 }

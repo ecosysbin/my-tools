@@ -23,6 +23,7 @@ cd kafka_2.12-2.5.0
 
 # 创建topic
 ./bin/kafka-topics.sh --create --partitions 1 --replication-factor 1 --topic test1 --bootstrap-server 10.220.9.91:9092
+./kafka-topics.sh --create --partitions 1 --replication-factor 1 --topic test --bootstrap-server 10.220.9.21:9092
 
 # topic列表
 ./bin/kafka-topics.sh --list --zookeeper 10.220.9.91:2181
@@ -39,3 +40,7 @@ cd kafka_2.12-2.5.0
 # 消费
 ./bin/kafka-console-consumer.sh --bootstrap-server 10.220.9.91:9092 --topic test1 --from-beginning
 ./kafka-console-consumer.sh --bootstrap-server 10.220.9.91:9092 --topic test --from-beginning
+
+
+
+kafka-configs --describe --bootstrap-server <broker-list>

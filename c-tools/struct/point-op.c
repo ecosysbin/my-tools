@@ -17,6 +17,12 @@ int main()
     struct student stu1 = {20, 30};
     printf("%d %d\n", stu1.name, stu1.age);
 
+    // 使用原生结构体通过属性名定义变量
+    struct student stu2 = {
+        .name = 90,
+        .age = 100,
+    };
+    printf("%d %d\n", stu2.name, stu2.age);
     // 使用结构体别名定义变量
     student_def stu;
     stu.name = 10;

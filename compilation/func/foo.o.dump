@@ -1,0 +1,17 @@
+
+foo.o:     file format elf64-x86-64
+
+
+Disassembly of section .text:
+
+0000000000000000 <foo>:
+   0:   f3 0f 1e fa             endbr64
+   4:   c3                      ret
+
+
+## 介绍文档生成的汇编代码
+0000000000000000 <_foo>:
+       0: 55                           	pushq	%rbp
+       1: 48 89 e5                     	movq	%rsp, %rbp
+       4: 5d                           	popq	%rbp
+       5: c3                           	retq

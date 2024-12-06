@@ -1,0 +1,102 @@
+
+1. go环境配置
+go sdk下载：https://studygolang.com/dl
+
+修改go proxy: go env -w GOPROXY=https://goproxy.cn,direct     -- 阿里源，部分包拉不下来，需要使用goproxy源
+
+linux下配置gopath 
+cat  /etc/profile.d/my_env.sh; source /etc/profile.d/my_env.sh 
+export GOROOT=/opt/go
+export PATH=$PATH:$GOROOT/bin
+export GOPATH=$HOME/goproject
+
+go env -w GOPROXY=http://192.168.1.16:3000
+
+2. go私库搭建
+go 私库  git clone https://github.com/gomods/athens.git，
+              修改Makefile GOPROXY="https://goproxy.cn,direct"
+              make build-ver VERSION="0.2.0"
+修改config.dev.toml   
+FilterFile = "./filterFile"
+GlobalEndpoint = "https://mirrors.aliyun.com/goproxy"  // 需要和FilterFile同时配置，不然不生效
+GoGetDir = "/data/athens/storage"   # go get 时的目录，配置了该目录，客户端拉取包报404 --- 当前配置的data目录不生效
+FilterFile = "./filterFile" 为空 -- 拉不下来镜像。。。 看着存储跑到这边了/home/pkg/mod/github.com
+DownloadMode = "sync" 可能会影响
+StorageType = "disk"
+Storage.Disk RootPath = "/opt/athens/data"
+go 私库部分三方库拉不下来报错502，直接使用阿里源能够拉取
+Go开发环境搭建操作指南
+
+D
+# 内网的gitlab不需要通过GlobalEndpoint下载
++ git.example.com
++ github.com/gomods/athens v0.1,v0.2,v0.4.1
+
+./athens -config_file=./config.dev.toml
+-gcflags“-N -l -m”  -N:禁止优化 -l:禁止内联 -m:输出优化信息
+-ldflags“-w -s”     -w:禁用DRWA调试信息  -s:禁用符号表
+
+GO111MODULE=on CGO_ENABLED=0 GOPROXY="https://mirrors.aliyun.com/goproxy" go build -o test .
+GOOS=linux GOARCH=amd64 go build -o test .
+3. 
+docker run -d -v /opt/data:/var/lib/athens \
+    -v /home/filterFile:/var/lib/athens/FilterFile \
+    -e ATHENS_DISK_STORAGE_ROOT=/var/lib/athens \
+    -e ATHENS_FILTER_FILE=/var/lib/athens/FilterFile \
+    -e ATHENS_GLOBAL_ENDPOINT=https://mirrors.aliyun.com/goproxy \
+    -e ATHENS_STORAGE_TYPE=disk \
+    --name athens-proxy \
+    --restart always \
+    -p 3000:3000 \
+    gomods/athens
+Visual Studio Code
+docker run -d -v /root/athens-storage:/var/lib/athens  -e ATHENS_DISK_STORAGE_ROOT=/var/lib/athens -e ATHENS_STORAGE_TYPE=disk -e ATHENS_GLOBAL_ENDPOINT=https://mirrors.aliyun.com/goproxy -e ATHENS_FILTER_FILE=/var/lib/athens/FilterFile   --name athens-proxy  --restart always -p 3000:3000    gomods/athens:v0.2.0
+GO111MODULE=on CGO_ENABLED=0 GOPROXY="https://mirrors.aliyun.com/goproxy" go build -ldflags "-X github.com/gomods/athens/pkg/build.version=0.2.0" -o athens ./cmd/proxy
+GO111MODULE=on CGO_ENABLED=0 GOPROXY="https://mirrors.aliyun.com/goproxy" go build -ldflags "-X github.com/gomods/athens/pkg/build.version=$(VERSION) -X github.com/gomods/athens/pkg/build.buildDate=$(DATE)" -o athens ./cmd/proxy
+GO111MODULE=on CGO_ENABLED=0 GOPROXY="https://mirrors.aliyun.com/goproxy" go build -o k3s
+	
+vs-code go插件
+godef	          vscode插件，快速提示信息,跳转到定义         
+gopls   	vscode插件，语言服务，代码及错误提示插件
+go-outline	vscode插件，代码大纲组件
+===delve  	vscode插件，调试代码
+===dlv	         vscode插件，调试代码
+
+gofmt         代码格式化                go内置                go fmt   dir/file
+goimports  ⼯具检查导⼊             /home/goproject/src/golang.org/x# git clone https://github.com/golang/tools.git    go install golang.org/x/tools/cmd/goimports    cp $GOPATH/bin/goimports /usr/local/bin/
+goimports file
+
+
+golint   ⼯具检查代码规范             主要检查命名规范     golint file/dir   先下载，编译mkdir -p $GOPATH/src/golang.org/x/    cd $GOPATH/src/golang.org/x/    git clone https://github.com/golang/lint.git   go install   在讲$GOPATH/bin/下的golint设置为环境变量       
+root@wangbin:/home/goproject/src/athens/cmd/proxy# ls
+actions  Dockerfile  main.go
+root@wangbin:/home/goproject/src/athens/cmd/proxy# golint
+main.go:1:1: don't use an underscore in package name
+main.go:13:2: a blank import should be only in a main or test package, or have a comment justifying it
+
+go install $GOPATH/src/golang.org/x/golint/
+
+go vet  ⼯具静态分析代码实现      go内置                go vet   dir/file    例如：通过%d打印string类型， go build不会报错。go vert会报错
+a := "ni hao"
+fmt.Printf("print %d", a)
+PS E:\gospace\src\mystarter\src> go vet 
+# mystarter/src
+.\main.go:20:2: fmt.Printf format %d has arg a of wrong type string
+
+goimports
+
+枚举类型从0开始的好处（可以和零值区分开）
+
+Go开发环境搭建操作指南
+git clone https://github.com/golang/lint.git
+git clone https://github.com/golang/tools.git
+4. go编码规范问题记录：
+1. 示例代码格式不正确:  27: 单元测试规范  （几乎所有代码片）
+2. go工具链自动化讨论： 3： ⼯程化要求
+3. 接口命名规范  7页
+4. 如果需要在 if 之外使⽤函数调⽤的结果，则不应尝试缩⼩变量的作⽤范围  13页
+
+Effective Go  The Go common mistakes guide     
+git log --since="2022-09-01" --before="2022-12-12"  --author="wangbin187844" --pretty=tformat: --numstat | awk '{ add += $1; subs += $2; loc += $1 - $2 } END { printf "added lines: %s,removed lines: %s, total lines:%s\n", add, subs, loc }'
+
+

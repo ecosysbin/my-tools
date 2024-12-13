@@ -1,0 +1,44 @@
+- name: Deploy kubernetes cluster soft
+  remote_user: root
+  hosts: kube_master[0]
+  gather_facts: no
+  vars:
+    base_path: '/opt/deploy/kubernetes'
+  vars_files:
+    - ../common_vars.yml
+  tasks:
+    - name: Copy network-soft tmplete to file
+      template:
+        src: package/calico.yaml.j2
+        dest: '{{ base_path }}/calico.yaml'
+
+    - name: Copy metricserver tmplete to file
+      template:
+        src: package/metricserver.yaml.j2
+        dest: '{{ base_path }}/metricserver.yaml'
+
+    - name: Copy dashboard tmplete to file
+      template:
+        src: package/recommended.yaml.j2
+        dest: '{{ base_path }}/recommended.yaml'
+
+    - name: Install network soft
+      shell: 'kubectl apply -f {{ base_path }}/calico.yaml > {{ base_path }}/deploy_calico.log;cat {{ base_path }}/deploy_calico.log'
+      register: response
+      until: response.stdout.find('FAILED') == -1
+      retries: 3
+      delay: 5
+
+    - name: Install metricserver
+      shell: 'kubectl apply -f {{ base_path }}/metricserver.yaml > {{ base_path }}/deploy_metricserver.log;cat {{ base_path }}/deploy_metricserver.log'
+      register: response
+      until: response.stdout.find('FAILED') == -1
+      retries: 3
+      delay: 5
+
+    - name: Install dashboard
+      shell: 'kubectl apply -f {{ base_path }}/recommended.yaml > {{ base_path }}/deploy_dashboard.log;cat {{ base_path }}/deploy_dashboard.log'
+      register: response
+      until: response.stdout.find('FAILED') == -1
+      retries: 3
+      delay: 5

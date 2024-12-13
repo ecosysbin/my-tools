@@ -1,0 +1,49 @@
+- name: This playbook will confige optimization configuration and change timezone on target host
+  hosts: common
+  gather_facts: no
+  remote_user: root
+  vars_files:
+    - ../common_vars.yml
+  tasks:
+    - name: Set timezone to Asia/Shanghai
+      timezone:
+        name: Asia/Shanghai
+
+    - name: Edit limits.conf
+      lineinfile:
+        dest: '/etc/security/limits.conf'
+        line: 'root     {{ item }}'
+        regexp: '.*{{ item }}.*'
+        state: present
+      with_items:
+        - 'soft     nofile        65536'
+        - 'hard     nofile        65536'
+        - 'soft     nproc         8096'
+        - 'hard     nproc         8096'
+        - 'soft     memlock       unlimited'
+        - 'hard     memlock       unlimited'
+
+    - name: Edit sysctl.conf
+      lineinfile:
+        dest: '/etc/sysctl.conf'
+        line: '{{ item }}'
+        regexp: '^{{ item }}.*'
+        state: present
+      with_items:
+        - 'vm.swappiness = 1'
+        - 'net.core.somaxconn = 65535'
+        - 'net.core.netdev_max_backlog = 262144'
+        - 'vm.max_map_count = 655360'
+        - 'fs.file-max = 6553560'
+        - 'vm.overcommit_memory = 1'
+
+    - name: Validate conf
+      command: sysctl -p
+      register: sysctl
+
+    - name: View sysctl
+      debug:
+        msg: "{{ sysctl.stdout_lines }}"
+
+    - name: Reboot the machine
+      reboot:

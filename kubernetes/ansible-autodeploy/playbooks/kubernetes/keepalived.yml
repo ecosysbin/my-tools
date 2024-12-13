@@ -1,0 +1,71 @@
+- name: Deploy keepalived
+  hosts: kube_master
+  remote_user: root
+  gather_facts: no
+  vars:
+    base_path: '/opt/deploy/kubernetes'
+  vars_files:
+    - ../common_vars.yml
+  tasks:
+    - name: Check keepalived exists
+      service:
+        name: keepalived
+      register: keepalived_status
+
+    - name: Uninstall keepalived
+      apt:
+        name: keepalived
+        state: absent
+        purge: yes
+      when: "keepalived_status.status.ActiveState == 'active'"
+
+    - name: Clear keepalived config files
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /etc/keepalived/
+      when: "keepalived_status.status.ActiveState == 'active'"
+
+    - name: Create directory
+      file:
+        path: '{{ base_path }}/deb/'
+        state: directory
+
+    - name: Copy keepalived package
+      copy:
+        src: '../../resources/package/{{ item }}'
+        dest: '{{ base_path }}/deb/'
+      loop: [ "keepalived-2.0.19-2" ]
+
+    - name: Install keepalived
+      shell:
+        cmd: 'dpkg -i {{ base_path }}/deb/{{ item }}/*.deb'
+        chdir: '{{ base_path }}/deb/'
+      loop: [ "keepalived-2.0.19-2" ]
+
+    - name: Copy keepalived conf tmplete to manager node file
+      template:
+        src: 'package/keepalived_master.conf.j2'
+        dest: '/etc/keepalived/keepalived.conf'
+      when: ansible_ssh_host == groups['kube_master'][0]
+
+    - name: Copy keepalived conf tmplete to file
+      template:
+        src: 'package/keepalived_backup.conf.j2'
+        dest: '/etc/keepalived/keepalived.conf'
+      loop: "{{ groups['kube_master'] }}"
+      when: ansible_ssh_host != groups['kube_master'][0]
+
+    - name: Copy heart_check.sh to host
+      copy:
+        src: 'package/heart_check.sh'
+        dest: '/etc/keepalived/heart_check.sh'
+        mode: 0755
+
+    - name: Restart keepalived
+      systemd:
+        name: keepalived
+        state: restarted
+        daemon_reload: yes
+        enabled: yes

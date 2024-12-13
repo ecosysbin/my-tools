@@ -1,0 +1,58 @@
+- name: Deploy haproxy
+  hosts: kube_master
+  remote_user: root
+  gather_facts: no
+  vars:
+    base_path: '/opt/deploy/kubernetes'
+  vars_files:
+    - ../common_vars.yml
+  tasks:
+    - name: Check haproxy exists
+      service:
+        name: haproxy
+      register: haproxy_status
+
+    - name: Uninstall haproxy
+      apt:
+        name: haproxy
+        state: absent
+        purge: yes
+      when: "haproxy_status.status.ActiveState == 'active'"
+
+    - name: Clear haproxy config files
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /etc/haproxy/
+      when: "haproxy_status.status.ActiveState == 'active'"
+
+    - name: Create directory
+      file:
+        path: '{{ base_path }}/deb/'
+        state: directory
+
+    - name: Copy haproxy package
+      copy:
+        src: '../../resources/package/{{ item }}'
+        dest: '{{ base_path }}/deb/'
+      loop: [ "haproxy-2.0.13-2" ]
+
+
+    - name: Install haproxy
+      shell:
+        cmd: 'dpkg -i {{ base_path }}/deb/{{ item }}/*.deb'
+        chdir: '{{ base_path }}/deb/'
+      loop: [ "haproxy-2.0.13-2" ]
+
+    - name: Copy haproxy conf tmplete to file
+      template:
+        src: 'package/haproxy.cfg.j2'
+        dest: '/etc/haproxy/haproxy.cfg'
+
+    - name: reload haproxy
+      systemd:
+        name: haproxy
+        state: restarted
+        daemon_reload: yes
+        enabled: yes

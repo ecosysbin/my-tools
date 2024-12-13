@@ -1,0 +1,97 @@
+- name: Install docker for kubernetes
+  hosts: kube_master, kube_worker
+  remote_user: root
+  gather_facts: no
+  vars:
+    base_path: '/opt/deploy/kubernetes/docker'
+  vars_files:
+    - ../common_vars.yml
+  tasks:
+    - name: Check docker status
+      service:
+        name: docker
+      register: docker_service_status
+
+    - name: View docker status
+      debug:
+        msg: "{{ docker_service_status.status.ActiveState }}"
+
+    - name: Stop docker service
+      service:
+        name: docker.service
+        state: stopped
+      when: "docker_service_status.status.ActiveState == 'active'"
+
+    - name: Stop docker socket
+      service:
+        name: docker.socket
+        state: stopped
+      when: "docker_service_status.status.ActiveState == 'active'"
+
+    - name: Uninstall docker
+      command: 'dpkg --purge docker-ce docker-ce-cli docker-ce-rootless-extras docker-scan-plugin containerd.io'
+      when: "docker_service_status.status.AssertResult == 'yes'"
+
+    - name: Remove docker related stuffs
+      file:
+        dest: "{{ item }}"
+        state: absent
+      with_items:
+        - "/etc/docker"
+        - "/var/lib/docker"
+        - "/usr/lib/systemd/system/docker.service"
+        - "/usr/lib/systemd/system/docker.socket"
+
+    - name: Create directory
+      file:
+        path: '{{ base_path }}/deb/'
+        state: directory
+
+    - name: Copy docker-20.10.17 package
+      copy:
+        src: '../../resources/package/{{ item }}'
+        dest: '{{ base_path }}/deb/'
+      loop: [ "Docker-20.10.17" ]
+
+    - name: Install docker-20.10.17
+      shell:
+        cmd: 'dpkg -i ./{{ item }}/*.deb'
+        chdir: '{{ base_path }}/deb/'
+      loop: [ "Docker-20.10.17" ]
+
+    - name: Ensure docker service start
+      service:
+        name: docker
+        state: started
+
+    - name: Check docker version
+      shell: docker version
+      register: docker_version
+
+    - name: View version
+      debug:
+        msg: "{{ docker_version }}"
+
+    - name: Create /etc/docker directory
+      file:
+        dest: /etc/docker
+        state: directory
+
+    - name: Copy template daemon.json.j2
+      template:
+        src: 'package/daemon.json.j2'
+        dest: /etc/docker/daemon.json
+
+    - name: Edit docker.service
+      lineinfile:
+        dest: '/usr/lib/systemd/system/docker.service'
+        line: 'ExecStart=/usr/bin/dockerd -H tcp://0.0.0.0:2375 -H fd:// --containerd=/run/containerd/containerd.sock'
+        regexp: '^ExecStart=*'
+        state: present
+
+    - name: Restart docker
+      systemd:
+        name: docker
+        state: restarted
+        daemon_reload: yes
+        enabled: yes

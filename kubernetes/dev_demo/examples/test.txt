@@ -1,0 +1,6 @@
+image: nginx:latest
+containerPort: 80
+
+总image: nginx:latest
+containerPort: 80
+

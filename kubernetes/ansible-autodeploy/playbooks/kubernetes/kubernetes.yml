@@ -1,0 +1,26 @@
+- name: Prepare deploy kubernetes cluster
+  hosts: kube_master, kube_worker
+  remote_user: root
+  gather_facts: no
+  vars:
+    base_path: '/opt/deploy/kubernetes'
+  tasks:
+    - name: create kubernetes deploy dir
+      file:
+        path: '{{ base_path }}'
+        state: directory
+
+    - name: Disable swap fornow
+      shell: swapoff -a
+
+    - name: Disable swap forever
+      replace:
+        path: '/etc/fstab'
+        regexp: '^/swap'
+        replace: '#/swap'
+
+- import_playbook: ./kubernetes_undeploy.yml
+- import_playbook: ./haproxy.yml
+- import_playbook: ./keepalived.yml
+- import_playbook: ./docker.yml
+- import_playbook: ./kubernetes_manager.yml

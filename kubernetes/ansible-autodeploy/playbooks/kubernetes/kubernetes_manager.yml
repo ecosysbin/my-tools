@@ -1,0 +1,90 @@
+- name: Deploy kubernetes init cluster
+  remote_user: root
+  hosts: kube_master[0]
+  gather_facts: yes 
+  vars:
+    base_path: '/opt/deploy/kubernetes'
+    ip_addr: "{{ ansible_ssh_host }}"
+  vars_files:
+    - ../common_vars.yml
+  tasks:
+    - name: Create directory
+      file:
+        path: '{{ base_path }}/deb/'
+        state: directory
+
+    - name: Copy kubernetes-1.22.0 package
+      copy:
+        src: '../../resources/package/{{ item }}'
+        dest: '{{ base_path }}/deb/'
+      loop: [ "kubernetes-1.22.0" ]
+
+    - name: Install base soft lib
+      shell:
+        cmd: 'dpkg -i {{ base_path }}/deb/{{ item }}/*.deb'
+        chdir: '{{ base_path }}/deb/'
+      loop: [ "kubernetes-1.22.0/base" ]
+
+    - name: Install kubeadm kubelet kubectl conntrack
+      shell:
+        cmd: 'dpkg -i {{ base_path }}/deb/{{ item }}/*.deb'
+        chdir: '{{ base_path }}/deb/'
+      loop: [ "kubernetes-1.22.0" ]
+
+    - name: Restart kubelet
+      systemd:
+        name: kubelet
+        state: restarted
+        enabled: yes
+
+    - name: Copy kubeadm tmplete to file
+      template:
+        src: 'package/kubeadm-init-config.yaml.j2'
+        dest: '{{ base_path }}/kubeadm-init.yaml'
+
+    - name: Init kubernetes cluster
+      shell: 'kubeadm init --config {{ base_path }}/kubeadm-init.yaml --upload-certs --v=5> {{ base_path }}/kubeadm-init.log;{{ base_path }}/check_k8sconf.sh'
+      register: response
+      until: response.stdout.find('kubernetes conf exist') != -1
+      retries: 3
+      delay: 5
+
+    - name: Wait for kube-apiserver service startup
+      wait_for:
+        port: 6443
+        delay: 10
+
+    - name: Create kubernetes kubectl config file
+      shell: "mkdir -p $HOME/.kube; cp -i /etc/kubernetes/admin.conf $HOME/.kube/config; chown $(id -u):$(id -g) $HOME/.kube/config"
+
+    - name: Init certificate_key
+      shell: kubeadm init phase upload-certs --upload-certs > {{ base_path }}/certificate_key.log
+
+    - name: Register certificate_key
+      shell: cat {{ base_path }}/certificate_key.log | tail -1
+      register: kubeadm_certificateKey
+
+    - name: Register token
+      shell: kubeadm token list | grep system:bootstrappers:kubeadm | awk -F" " '{print $1}' |tail -1
+      register: kubeadm_token 
+
+    - name: Register ca_cert_hash
+      shell: openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'
+      register: kubeadm_ca_cert_hash
+
+    - name: Add kubernetes cluster node join command to host, to be shared between multiple hosts
+      add_host:
+        name: kube_join
+        kubeadm_init_host: "{{ ansible_ssh_host }}"
+        kubeadm_master_certificateKey: "{{ kubeadm_certificateKey.stdout }}"
+        kubeadm_token: "{{ kubeadm_token.stdout }}"
+        kubeadm_discovery_token_ca_cert_hash: "{{ kubeadm_ca_cert_hash.stdout }}"
+    
+    - name: Fetch kubeApiServer authfile
+      fetch:
+        src: '$HOME/.kube/config'
+        dest: './package/authfile'
+
+- import_playbook: ./kubernetes_master.yml
+- import_playbook: ./kubernetes_worker.yml
+- import_playbook: ./kubernetes_soft.yml

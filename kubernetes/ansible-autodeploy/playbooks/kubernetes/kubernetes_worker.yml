@@ -1,0 +1,60 @@
+- name: Create kubernetes cluster worker node
+  remote_user: root
+  hosts: kube_worker
+  gather_facts: no
+  vars_files:
+    - ../common_vars.yml
+  vars:
+    base_path: '/opt/deploy/kubernetes'
+    kubeadm_init_host: "{{ hostvars.kube_join.kubeadm_init_host }}"   
+    kubeadm_token: "{{ hostvars.kube_join.kubeadm_token }}"
+    kubeadm_discovery_token_ca_cert_hash: "{{ hostvars.kube_join.kubeadm_discovery_token_ca_cert_hash }}"
+    controlPlaneVip: "{{ kubernetes.controlPlaneVip }}"
+    controlPlanePort: "{{ kubernetes.controlPlanePort }}"
+  tasks:
+    - name: Create directory
+      file:
+        path: '{{ base_path }}/deb/'
+        state: directory
+
+    - name: Copy kubernetes package
+      copy:
+        src: '../../resources/package/{{ item }}'
+        dest: '{{ base_path }}/deb/'
+      loop: [ "kubernetes-1.22.0" ]
+
+    - name: Install base soft lib
+      shell:
+        cmd: 'dpkg -i {{ base_path }}/deb/{{ item }}/base/*.deb'
+        chdir: '{{ base_path }}/deb/'
+      loop: [ "kubernetes-1.22.0" ]
+
+    - name: Install kubeadm
+      shell:
+        cmd: 'dpkg -i {{ base_path }}/deb/{{ item }}/kubeadm.deb'
+        chdir: '{{ base_path }}/deb/'
+      loop: [ "kubernetes-1.22.0" ]
+
+    - name: Install kubelet
+      shell:
+        cmd: 'dpkg -i {{ base_path }}/deb/{{ item }}/kubelet.deb'
+        chdir: '{{ base_path }}/deb/'
+      loop: [ "kubernetes-1.22.0" ]
+
+    - name: Restart kubelet
+      systemd:
+        name: kubelet
+        state: restarted
+        enabled: yes
+
+    - name: View kubernetes worker node join command
+      debug:
+        msg: "kubeadm join {{ controlPlaneVip }}:6443 --token {{ kubeadm_token }} --discovery-token-ca-cert-hash sha256:{{ kubeadm_discovery_token_ca_cert_hash }} --v=5"
+      register: kube_join_debug
+
+    - name: Worker node Join to cluster
+      shell: "{{ kube_join_debug.msg }} > {{ base_path }}/kubeadm-join.log;{{ base_path }}/check_k8sconf.sh"
+      register: response
+      until: response.stdout.find('kubernetes conf exist') != -1
+      retries: 3
+      delay: 5

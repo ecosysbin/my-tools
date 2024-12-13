@@ -1,0 +1,26 @@
+- name: Prepare deploy kubernetes cluster
+  hosts: kube_master, kube_worker
+  remote_user: root
+  gather_facts: no
+  vars:
+    base_path: '/opt/deploy/kubernetes'
+  tasks:
+    - name: Check kubeapiserver exists
+      stat:
+        path: /etc/kubernetes/manifests/kube-apiserver.yaml
+      register: kubeapiserver_stat
+
+    - name: Shutdown kube-apiserver
+      shell: 'mv /etc/kubernetes/manifests/*.yaml /etc/kubernetes/'
+      when: kubeapiserver_stat.stat.exists
+
+    - name: Check kubelet exists
+      stat:
+        path: /usr/bin/kubelet
+      register: kubelet_stat
+
+    - name: Shutdown kubelet
+      systemd:
+        name: kubelet
+        state: stopped
+      when: kubelet_stat.stat.exists

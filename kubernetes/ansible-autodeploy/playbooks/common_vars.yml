@@ -1,0 +1,77 @@
+- ubuntu:
+    mirror: '172.21.44.31:8000'
+- docker:
+    registry-mirrors: 'http://172.21.44.31:6000' # docker 镜像仓库
+    insecure-registries: '172.21.44.32:5000'     # 私库
+- timing:
+    fm197:
+      port: '/dev/ttyUSB0'              # FM197硬件校时设备接口，要根据实际识别的接口调整
+    ntp:
+      server:
+        sync-way: ntp                   # ntp服务同步时间的方式。1.ntp表示从另一个ntp同步；2.local表示以本地时间为准；
+        ntp-way-server: '172.21.44.31'  # 如果sync-way选择ntp，可设置另一个ntp的地址
+      client:
+        root-distance-max-sec: 694800
+- swarm:
+    worker-node-hostname-prefix: 'worker'   # hostname 以 worker 开头的节点将以 worker 身份加入 swarm 集群
+    keepalived-vip: '172.21.44.201'
+    keepalived-vip-interface: 'ens2'   # keepalived vip绑定网络设备名称
+- kubernetes:
+    keepalived-vip: '172.21.44.130'   # kubernetes控制平面对外负载均衡地址
+    keepalived-vip-interface: 'ens2'   # keepalived vip绑定网络设备名称
+    control-plane-port: '16443'   # kubernetes控制平面对外负载均衡端口
+- mysql:
+    omms-password: 'omms'                   # 运维管理用户密码
+    root-password: '123456'                 # root用户密码
+    data-memory: 2GB                        # 数据内存，256MB~物理内存/3，此值*3必须小于物理内存
+    max-no-of-tables: 20320                 # 集群最大表数量，默认值128，范围8-20320，20KB/个
+    max-no-of-attributes: 10000             # 集群最大属性数，默认值1000，范围32-4294967039，200byte/个，所有元数据在服务器上完全复制
+    max-no-of-ordered-indexes: 3072         # 集群有序索引数，默认值 128，范围0-4294967039，10KB/个，唯一索引和主键既有1个有序索引还有1个哈希索引
+    # 数据节点上的每个事务有1条记录，集群中事务记录总数等于任意节点中的事务数乘以集群的节点数。
+    # 每个连接必须分配至少1条事务记录，所以集群事务记录数必须大于集群中所有节点的并发连接数。
+    # 默认值 4096，范围 32 - 4294967039
+    max-no-of-concurrent-transactions: 40960
+    # 每个事务至少涉及一个操作，MaxNoOfConcurrentOperations 必须大于等于 MaxNoOfConcurrentTransactions
+    # 默认值 32768，范围 32 - 4294967039，每个约占用1KB，上产环境建议
+    max-no-of-concurrent-operations: 327680
+- minio:
+    root-user: 'admin'              # root-user 至少3位
+    root-password: 'admin123'       # root-password至少8位
+    default-bucket: m7it
+    default-directory: [ 'portainer', 'hmi-storage', 'logic', 'pythonlab', 'system', 'udpio-config', 'flowable', 'securityManagement', 'web-monitor-record' ]
+- elasticsearch:
+    cluster:
+      name: 'm7-es-cluster'
+    jvm: # 内存设置范围：（1/3~1/2）* 物理内存，建议值：3/7 * 物理内存 最大不超过31G
+      xms: 2G
+      xmx: 2G
+- kafka:
+    topic:
+      auto-create: false          # 主题不存在则创建
+      initial: true               # 初始化主题列表，参考 kafka/package/kafka-topic-init.json
+    jvm:
+      xms: 256M
+      xmx: 256M
+    encryption: false               # 是否加密
+- redis:
+    password: '1OAKd0MJ'            # 所有应用都采用该密码，如果要修改，请确保应用配置同步修改
+    maxmemory: 1073741824           # 设置最大内存为 1GB
+    maxmemory-policy: 'allkeys-lru' # 最大内存策略
+- vernemq:
+    leveldb:
+      maximum_memory: 1073741824  # vernemq的leveldb数据库占用的最大内存，默认1GB
+- perfmonitor:
+    namespace:
+      # 命名空间前缀只能使用英文、数字、下划线，首字符需为英文字母
+      # 下划线不能为第一个字符，后缀会自动拼接ip的最后一节，字符总长度不能大于32
+      # 例：server_180
+      prefix: 'server_'
+- dbbridge:
+    domain-name: 'test'
+    pt-table-topic: 'macs.v2.tagschema'
+    pt-data-topic: 'macs.v2.rtdata'
+    authentication: 'Q6Gz7OCUSH2Rvmjbth2SIw'
+- portainer:
+    version: '2.9.3'                # 配置portainer-ce版本，安装前看下私库中有没有对应的版本
+    username: 'admin'
+    password: '12345678'

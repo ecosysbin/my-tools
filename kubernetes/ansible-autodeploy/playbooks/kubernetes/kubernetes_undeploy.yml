@@ -1,0 +1,60 @@
+- name: Prepare deploy kubernetes cluster
+  hosts: kube_master, kube_worker
+  remote_user: root
+  gather_facts: no
+  vars:
+    base_path: '/opt/deploy/kubernetes'
+  tasks:
+    - name: Check kubelet exists
+      stat:
+        path: /usr/bin/kubelet
+      register: kubelet_stat
+
+    - name: umount kubelet pods
+      shell: umount $(df -HT|grep 'kubelet'|awk '{print $7}'); rm -rf /var/lib/kubelet/
+      ignore_errors: yes
+      when: kubelet_stat.stat.exists
+
+    - name: Copy check_k8sconf.sh to host
+      copy:
+        src: 'package/check_k8sconf.sh'
+        dest: '{{ base_path }}/check_k8sconf.sh'
+        mode: 0755
+
+    - name: Check kubeadm exists
+      stat:
+        path: /usr/bin/kubeadm
+      register: kubeadm_stat
+
+    - name: Kubeadm reset if it exists
+      shell: 'kubeadm reset -f > {{ base_path }}/kubeadm_reset.log;{{ base_path }}/check_k8sconf.sh'
+      register: response
+      until: response.stdout.find('kubernetes conf not exist') != -1
+      retries: 3
+      delay: 5
+      when: kubeadm_stat.stat.exists
+
+    - name: Uninstall kubernetes and related soft
+      apt:
+        name: [ kubeadm, kubelet, kubectl ]
+        state: absent
+        purge: yes
+      ignore_errors: yes
+      when: kubeadm_stat.stat.exists
+
+    - name: Clear kubernetes related files
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /etc/kubernetes/
+        - /etc/systemd/system/kubelet.service.d
+        - /usr/bin/kubeadm
+        - /usr/bin/kubectl
+        - /usr/bin/kubelet
+        - /var/lib/etcd
+        - /var/lib/cni
+        - /var/lib/dockershim
+        - /var/lib/kubelet
+        - $HOME/.kube/
+      when: kubeadm_stat.stat.exists

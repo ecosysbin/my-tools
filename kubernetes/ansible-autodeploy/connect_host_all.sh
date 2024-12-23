@@ -21,7 +21,7 @@ function sshCopyId {
 	};
 	expect eof;"
 }
- 
+
 for server in $SERVERS
 do
 	sshCopyId "$server"

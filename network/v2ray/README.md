@@ -37,5 +37,8 @@ unzip v2rayN-v3.27.zip
 
 ### 3.4 要是公司内部使用可能要将v2rayN的端口映射到公司内网，这样就可以在公司内网下访问互联网了。这样可以在内网选择一台有图形界面的服务器，配置好v2rayN，然后通过内网访问互联网。其他服务器就可以将代理设置为这台机器的转发端口正常上网了。
 设置代理的指令：
-windows下：set HTTP_PROXY=http://172.20.3.88:1088;set HTTPS_PROXY=http://172.20.3.88:1088;
-linux下：export HTTP_PROXY=http://172.20.3.88:1088;export HTTPS_PROXY=http://172.20.3.88:1088;
+windows下：
+set HTTP_PROXY=http://172.20.3.88:1088
+set HTTPS_PROXY=http://172.20.3.88:1088
+linux下：
+export HTTP_PROXY=http://172.20.3.88:1088;export HTTPS_PROXY=http://172.20.3.88:1088;

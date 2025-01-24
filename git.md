@@ -96,7 +96,7 @@ git checkout -b new_branch
 ```
 2. 然后执行如下命令，将远端未合入的PR和并到本地（有冲突时可以直接-f）
 ```
-git pull origin pull/3874/head:network-topology
+git pull -f volcano pull/3965/head:network-topology
 ```
 2.1 git pll 可能仍然会冲突，这时简单起见，可以先git checkout到pull PR之前的commit，然后git pull
 ```
@@ -126,3 +126,5 @@ git checkout network-topology  # 切换到 network-topology 分支
 git reset --hard temp  # 强制将 network-topology 分支重置为 temp 分支的状态
 
 6. commit并push到远端仓库
+
+7. github 将远端仓库的clone到本地仓库，假设最终要向远程xxx分支提交代码，本地不建议直接在xxx分支提交代码。这样假如有多个特性开发则都可以从xxx分支checkout进行开发。

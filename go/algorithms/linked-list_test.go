@@ -9,9 +9,11 @@ func TestReverse(t *testing.T) {
 	head := &Node{Val: 1, Next: &Node{Val: 2, Next: &Node{Val: 3, Next: &Node{Val: 4, Next: &Node{Val: 5}}}}}
 	fmt.Println("Original List:")
 	print(head)
-	newHead := reverse(head)
+	// newHead := reverse(head)
 	fmt.Println("Reversed List:")
-	print(newHead)
+	newHeadFre := reverseNode(head)
+	// print(newHead)
+	print(newHeadFre)
 }
 
 func TestCombine(t *testing.T) {

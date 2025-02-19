@@ -46,6 +46,11 @@ git push origin --delete dev
 git reset --soft <commit-id>
 ```
 
+## git add 命令将文件添加到暂存区后，如果想要撤销这个操作
+```
+git reset HEAD <file_name>
+```
+
 ## 合并最近的几次commit，打开交互式编辑器后，按i进入编辑模式，将pick改为s或squash，保存退出，然后输入提交信息，保存退出，最后输入`git push -f`强制推送。
 ```
 git rebase -i HEAD~3
@@ -128,3 +133,5 @@ git reset --hard temp  # 强制将 network-topology 分支重置为 temp 分支�
 6. commit并push到远端仓库
 
 7. github 将远端仓库的clone到本地仓库，假设最终要向远程xxx分支提交代码，本地不建议直接在xxx分支提交代码。这样假如有多个特性开发则都可以从xxx分支checkout进行开发。
+
+8. github提交pending的评论

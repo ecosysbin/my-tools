@@ -1,0 +1,8 @@
+plugin:
+  multi-storage-requester:
+    optional: true
+    image: plugins/vcluster-plugin-storagemanager:develop-20241210114846
+    imagePullPolicy: Always
+    volumeMounts:
+      - name: kubeconfig-shared
+        mountPath: /root/.kube

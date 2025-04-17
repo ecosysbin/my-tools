@@ -1,0 +1,21 @@
+#cloud-config
+disable_root: false
+ssh_pwauth: true
+user: {{ .UserName }}
+password: {{ .PassWord }}
+package_update: true
+ackage_upgrade: true
+packages:
+  - net-tools
+  - nvidia-driver-470
+write_files:
+- path: /etc/apt/sources.list
+  content: |
+    deb https://mirrors.aliyun.com/ubuntu/ jammy main restricted universe multiverse
+    deb-src https://mirrors.aliyun.com/ubuntu/ jammy main restricted universe multiverse
+    deb https://mirrors.aliyun.com/ubuntu/ jammy-security main restricted universe multiverse
+    deb-src https://mirrors.aliyun.com/ubuntu/ jammy-security main restricted universe multiverse
+    deb https://mirrors.aliyun.com/ubuntu/ jammy-updates main restricted universe multiverse
+    deb-src https://mirrors.aliyun.com/ubuntu/ jammy-updates main restricted universe multiverse
+    deb https://mirrors.aliyun.com/ubuntu/ jammy-backports main restricted universe multiverse
+    deb-src https://mirrors.aliyun.com/ubuntu/ jammy-backports main restricted universe multiverse"

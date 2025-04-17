@@ -1,0 +1,4 @@
+mapServices:
+  fromVirtual:
+    - from: vcluster-aB3xYz9KlM7n/aim-svc
+      to: aim-svc

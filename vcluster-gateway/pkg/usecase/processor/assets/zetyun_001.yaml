@@ -1,0 +1,7 @@
+zetyun:
+  storageclass:
+    clusterId: 7e4c0eda-02e0-11ef-bedf-e4434b2ce110
+    list:
+      - name: cephfs-mix
+        type: aps
+        ns: cephfs

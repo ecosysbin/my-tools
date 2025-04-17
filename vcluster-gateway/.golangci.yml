@@ -1,0 +1,72 @@
+run:
+
+linters-settings:
+  stylecheck:
+    # STxxxx checks in https://staticcheck.io/docs/configuration/options/#checks
+    # Default: ["*"]
+    checks: [ "all", "-ST1003" ]
+    # https://staticcheck.io/docs/configuration/options/#dot_import_whitelist
+    # Default: ["github.com/mmcloughlin/avo/build", "github.com/mmcloughlin/avo/operand", "github.com/mmcloughlin/avo/reg"]
+    dot-import-whitelist:
+      - fmt
+    # https://staticcheck.io/docs/configuration/options/#initialisms
+    # Default: ["ACL", "API", "ASCII", "CPU", "CSS", "DNS", "EOF", "GUID", "HTML", "HTTP", "HTTPS", "ID", "IP", "JSON", "QPS", "RAM", "RPC", "SLA", "SMTP", "SQL", "SSH", "TCP", "TLS", "TTL", "UDP", "UI", "GID", "UID", "UUID", "URI", "URL", "UTF8", "VM", "XML", "XMPP", "XSRF", "XSS", "SIP", "RTP", "AMQP", "DB", "TS"]
+    initialisms: [ "ACL", "API", "ASCII", "CPU", "CSS", "DNS", "EOF", "GUID", "HTML", "HTTP", "HTTPS", "ID", "IP", "JSON", "QPS", "RAM", "RPC", "SLA", "SMTP", "SQL", "SSH", "TCP", "TLS", "TTL", "UDP", "UI", "GID", "UID", "UUID", "URI", "URL", "UTF8", "VM", "XML", "XMPP", "XSRF", "XSS", "SIP", "RTP", "AMQP", "DB", "TS" ]
+    # https://staticcheck.io/docs/configuration/options/#http_status_code_whitelist
+    # Default: ["200", "400", "404", "500"]
+    http-status-code-whitelist: [ "200", "400", "404", "500" ]
+  revive:
+    rules:
+      - name: var-naming
+        severity: warning
+        disabled: false
+        exclude: [ "" ]
+        arguments:
+          - [ "ID", "URL", "JSON" ] # AllowList
+          - [ "VM" ] # DenyList
+          - - upperCaseConst: true
+
+output:
+  sort-results: true
+  print-linter-name: true
+  uniq-by-line: false
+
+linters:
+  disable-all: true
+  enable:
+    - ineffassign
+    - typecheck
+    - unused
+    # 'structcheck' is deprecated (since v1.49.0) due to: The owner seems to have abandoned the linter. Replaced by unused.
+    # - structcheck
+    # 'deadcode' is deprecated (since v1.49.0) due to: The owner seems to have abandoned the linter. Replaced by unused.
+    # - deadcode
+    - gosimple
+    - goimports
+    - errcheck
+    - staticcheck
+    - stylecheck
+    - gosec
+    - asciicheck
+    - bodyclose
+    - exportloopref
+    - rowserrcheck
+    - makezero
+    - durationcheck
+    - prealloc
+    - predeclared
+    - revive
+    - gofmt
+    - gas
+    # - goconst
+    - gocritic
+    - govet
+    # 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner. Replaced by govet 'fieldalignment'.
+    # - maligned
+    - megacheck
+    - unconvert
+
+    # fixme:
+    # - lll
+  fast: false
+

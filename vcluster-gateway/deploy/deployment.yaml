@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vcluster-g-1.1
+  namespace: gcp
+  labels:
+    app: vcluster-g-1.1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vcluster-g-1.1
+  template:
+    metadata:
+      labels:
+        app: vcluster-g-1.1
+    spec:
+      tolerations:
+        - key: nodepool
+          operator: Equal
+          value: fault
+          effect: NoSchedule
+        - key: dc.com/sys.node.base
+          operator: Equal
+          value: enable
+          effect: NoSchedule
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+      containers:
+        - name: vcluster-g
+          image: harbor.zetyun.cn/gcp/vcluster-gateway-connectrpc-1.1:v0.0.2
+          ports:
+            - containerPort: 8083
+          env:
+            - name: GCP_AUTHZ_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: gcp-apikey
+                  key: GCP_AUTHZ_API_KEY
+          resources:
+            limits:
+              cpu: "2"
+              memory: 4Gi
+            requests:
+              cpu: "2"
+              memory: 4Gi
+          volumeMounts:
+            - name: vcluster-g-volume
+              mountPath: /etc/config.yaml
+              subPath: config.yaml
+      volumes:
+        - name: vcluster-g-volume
+          configMap:
+            name: vcluster-g
+            items:
+              - key: config.yaml
+                path: config.yaml
+      serviceAccountName: vcluster-gateway-sa

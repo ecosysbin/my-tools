@@ -1,0 +1,1309 @@
+definitions:
+  response.BaseResponse:
+    properties:
+      data: { }
+      msg:
+        type: string
+      status:
+        type: integer
+    type: object
+  v1.Cluster:
+    properties:
+      insecure-skip-tls-verify:
+        type: boolean
+      server:
+        type: string
+    type: object
+  v1.Clusters:
+    properties:
+      cluster:
+        $ref: '#/definitions/v1.Cluster'
+      name:
+        type: string
+    type: object
+  v1.Configmap:
+    properties:
+      createTime:
+        type: string
+      data:
+        type: integer
+      name:
+        type: string
+      namespace:
+        type: string
+      object: { }
+    type: object
+  v1.Configs:
+    properties:
+      configKey:
+        type: string
+      configValue:
+        type: string
+    type: object
+  v1.Context:
+    properties:
+      cluster:
+        type: string
+      user:
+        type: string
+    type: object
+  v1.Contexts:
+    properties:
+      context:
+        $ref: '#/definitions/v1.Context'
+      name:
+        type: string
+    type: object
+  v1.Deployment:
+    properties:
+      avaliable:
+        type: integer
+      containers:
+        type: string
+      createTime:
+        type: string
+      images:
+        type: string
+      name:
+        type: string
+      namespace:
+        type: string
+      object: { }
+      ready:
+        type: string
+      selector:
+        type: string
+      updatedReplicas:
+        type: integer
+    type: object
+  v1.Event:
+    properties:
+      level:
+        type: string
+      message:
+        type: string
+      name:
+        type: string
+      namespace:
+        type: string
+      reason:
+        type: string
+      time:
+        type: string
+    type: object
+  v1.EventV1:
+    properties:
+      createTime:
+        type: string
+      lastTime:
+        type: string
+      level:
+        type: string
+      message:
+        type: string
+      name:
+        type: string
+      namespace:
+        type: string
+      object: { }
+      reason:
+        type: string
+    type: object
+  v1.Ingress:
+    properties:
+      class:
+        type: string
+      createTime:
+        type: string
+      hosts:
+        type: string
+      name:
+        type: string
+      namespace:
+        type: string
+      object: { }
+    type: object
+  v1.KubeConfig:
+    properties:
+      apiVersion:
+        type: string
+      clusters:
+        items:
+          $ref: '#/definitions/v1.Clusters'
+        type: array
+      contexts:
+        items:
+          $ref: '#/definitions/v1.Contexts'
+        type: array
+      current-context:
+        type: string
+      kind:
+        type: string
+      preferences:
+        $ref: '#/definitions/v1.Preferences'
+      users:
+        items:
+          $ref: '#/definitions/v1.Users'
+        type: array
+    type: object
+  v1.Namespace:
+    properties:
+      createTime:
+        type: string
+      name:
+        type: string
+      object: { }
+      status:
+        type: string
+    type: object
+  v1.Pod:
+    properties:
+      createTime:
+        type: string
+      events:
+        items:
+          $ref: '#/definitions/v1.Event'
+        type: array
+      name:
+        type: string
+      namespace:
+        type: string
+      node:
+        type: string
+      object: { }
+      ready:
+        type: string
+      restarts:
+        type: integer
+      status:
+        $ref: '#/definitions/v1.Status'
+    type: object
+  v1.Preferences:
+    type: object
+  v1.ProductCategories:
+    properties:
+      code:
+        type: string
+      seq:
+        type: string
+      value:
+        type: string
+    type: object
+  v1.ProductSpec:
+    properties:
+      product_categories:
+        items:
+          $ref: '#/definitions/v1.ProductCategories'
+        type: array
+      products:
+        items:
+          $ref: '#/definitions/v1.Products'
+        type: array
+      storage:
+        items:
+          $ref: '#/definitions/v1.Storage'
+        type: array
+    type: object
+  v1.Products:
+    properties:
+      category:
+        type: string
+      code:
+        type: string
+      configs:
+        items:
+          $ref: '#/definitions/v1.Configs'
+        type: array
+      name:
+        type: string
+    type: object
+  v1.Pvc:
+    properties:
+      createTime:
+        type: string
+      data:
+        type: integer
+      name:
+        type: string
+      namespace:
+        type: string
+      object: { }
+    type: object
+  v1.Resourcequotas:
+    properties:
+      cpu:
+        additionalProperties:
+          type: integer
+        type: object
+      gpu:
+        additionalProperties:
+          type: integer
+        type: object
+      memory:
+        additionalProperties:
+          type: integer
+        type: object
+      storage:
+        additionalProperties:
+          additionalProperties:
+            type: integer
+          type: object
+        type: object
+    type: object
+  v1.Secret:
+    properties:
+      createTime:
+        type: string
+      data:
+        type: integer
+      name:
+        type: string
+      namespace:
+        type: string
+      object: { }
+      type:
+        type: string
+    type: object
+  v1.Service:
+    properties:
+      clusterIP:
+        type: string
+      createTime:
+        type: string
+      externalIPs:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+      namespace:
+        type: string
+      object: { }
+      ports:
+        type: string
+      selector:
+        type: string
+      type:
+        type: string
+    type: object
+  v1.StatefulSet:
+    properties:
+      containers:
+        type: string
+      createTime:
+        type: string
+      images:
+        type: string
+      name:
+        type: string
+      namespace:
+        type: string
+      object: { }
+      ready:
+        type: string
+      selector:
+        type: string
+    type: object
+  v1.Status:
+    enum:
+      - Running
+      - Starting
+      - Paused
+      - Deleted
+      - Unknown
+    type: string
+    x-enum-varnames:
+      - StatusRunning
+      - StatusStarting
+      - StatusPaused
+      - StatusDeleted
+      - StatusUnknown
+  v1.Storage:
+    properties:
+      default:
+        type: integer
+      max:
+        type: integer
+      min:
+        type: integer
+      name:
+        type: string
+      storageClass:
+        type: string
+    type: object
+  v1.User:
+    properties:
+      token:
+        type: string
+    type: object
+  v1.Users:
+    properties:
+      name:
+        type: string
+      user:
+        $ref: '#/definitions/v1.User'
+    type: object
+  v1.VCluster:
+    properties:
+      apsURL:
+        type: string
+      comment:
+        type: string
+      context:
+        type: string
+      createTime:
+        type: string
+      deleteTime:
+        type: string
+      id:
+        type: string
+      instanceId:
+        type: string
+      instanceSpec:
+        type: string
+      manageBy:
+        type: string
+      name:
+        type: string
+      namespace:
+        type: string
+      product:
+        type: string
+      startedTime:
+        type: string
+      status:
+        $ref: '#/definitions/v1.Status'
+      utilizationRate:
+        allOf:
+          - $ref: '#/definitions/v1.Resourcequotas'
+        description: Storage         map[string]int `gorm:"-" json:"storage"`
+    type: object
+  vcluster_gateway.InstanceSpec:
+    properties:
+      paramName:
+        type: string
+      paramValue:
+        type: string
+      resourceSpecCode:
+        type: string
+      resourceSpecId:
+        type: integer
+      resourceSpecParamCode:
+        type: string
+      resourceSpecParamId:
+        type: integer
+    type: object
+  vcluster_gateway.OrderInfo:
+    properties:
+      actualAmount:
+        type: integer
+      amount:
+        type: integer
+      cycleCount:
+        type: integer
+      orderType:
+        type: integer
+      productCode:
+        type: string
+      productId:
+        type: integer
+      resourceTypeCode:
+        type: string
+      resourceTypeId:
+        type: integer
+    type: object
+  vcluster_gateway.Orderlist:
+    properties:
+      instanceId:
+        type: string
+      instanceSpec:
+        items:
+          $ref: '#/definitions/vcluster_gateway.InstanceSpec'
+        type: array
+      orderInfo:
+        $ref: '#/definitions/vcluster_gateway.OrderInfo'
+    type: object
+  vcluster_gateway.Orders:
+    properties:
+      desc:
+        type: string
+      name:
+        type: string
+      orderList:
+        items:
+          $ref: '#/definitions/vcluster_gateway.Orderlist'
+        type: array
+      tenantId:
+        type: string
+      userName:
+        type: string
+      vclusterDesc:
+        type: string
+      vclusterName:
+        type: string
+    type: object
+  vcluster_gateway.VclusterInfo:
+    properties:
+      comment:
+        type: string
+      context:
+        example: defaultcluster
+        type: string
+      desc:
+        type: string
+      instanceId:
+        type: string
+      name:
+        type: string
+      orders:
+        $ref: '#/definitions/vcluster_gateway.Orders'
+      product:
+        type: string
+    type: object
+host: localhost:8083
+info:
+  contact: { }
+  description: This is an authorization authentication proxy service.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: GCP VclusterGateway Gateway API
+  version: "1.0"
+paths:
+  /vc/v1/create:
+    post:
+      consumes:
+        - application/json
+      description: create vcluster
+      parameters:
+        - description: 用户 JWT token
+          in: header
+          name: X-Access-Token
+          required: true
+          type: string
+        - description: 参数
+          in: body
+          name: post
+          required: true
+          schema:
+            $ref: '#/definitions/vcluster_gateway.Orders'
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    type: string
+                type: object
+      summary: create vcluster
+      tags:
+        - create
+  /vc/v1/create/workflow:
+    post:
+      consumes:
+        - application/json
+      description: create vcluster from workflow
+      parameters:
+        - description: 用户 JWT token
+          in: header
+          name: X-Access-Token
+          required: true
+          type: string
+        - description: 参数
+          in: body
+          name: post
+          required: true
+          schema:
+            $ref: '#/definitions/vcluster_gateway.Orders'
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    type: string
+                type: object
+      summary: create vcluster from workflow
+      tags:
+        - create
+  /vc/v1/delete:
+    delete:
+      consumes:
+        - application/json
+      description: delete vcluster
+      parameters:
+        - description: 用户 JWT token
+          in: header
+          name: X-Access-Token
+          required: true
+          type: string
+        - description: 集群id
+          in: query
+          name: id
+          required: true
+          type: string
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    type: string
+                type: object
+      summary: Get VCluster Event
+      tags:
+        - delete
+  /vc/v1/edit/service:
+    post:
+      consumes:
+        - application/json
+      description: Update VCluster Service info
+      parameters:
+        - description: 用户 JWT token
+          in: header
+          name: X-token
+          required: true
+          type: string
+        - description: 集群id
+          in: query
+          name: id
+          required: true
+          type: string
+        - description: 集群描述信息
+          in: body
+          name: post
+          required: true
+          schema:
+            $ref: '#/definitions/vcluster_gateway.VclusterInfo'
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    $ref: '#/definitions/v1.ProductSpec'
+                type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    type: string
+                type: object
+      summary: Update VCluster Service
+      tags:
+        - Service
+  /vc/v1/event/:
+    get:
+      consumes:
+        - application/json
+      description: get vcluster all event
+      parameters:
+        - description: 用户 JWT token
+          in: header
+          name: X-Access-Token
+          required: true
+          type: string
+        - description: 集群id
+          in: query
+          name: id
+          required: true
+          type: string
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    items:
+                      $ref: '#/definitions/v1.Event'
+                    type: array
+                type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    type: string
+                type: object
+      summary: Get VCluster Event
+      tags:
+        - Event
+  /vc/v1/list:
+    get:
+      consumes:
+        - application/json
+      description: get vcluster list
+      parameters:
+        - description: 用户 JWT token
+          in: header
+          name: X-Access-Token
+          required: true
+          type: string
+        - default: "0"
+          description: 集群状态，已删除(1)或正常运行(0)
+          enum:
+            - "1"
+            - "0"
+          in: query
+          name: deleted
+          type: string
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    items:
+                      $ref: '#/definitions/v1.VCluster'
+                    type: array
+                type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    type: string
+                type: object
+      summary: get vcluster list
+      tags:
+        - list
+  /vc/v1/list/configmaps:
+    get:
+      consumes:
+        - application/json
+      description: get vcluster all configmap
+      parameters:
+        - description: 用户 JWT token
+          in: header
+          name: X-Access-Token
+          required: true
+          type: string
+        - description: 集群id
+          in: query
+          name: id
+          required: true
+          type: string
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    items:
+                      $ref: '#/definitions/v1.Configmap'
+                    type: array
+                type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    type: string
+                type: object
+      summary: Get VCluster configmap
+      tags:
+        - resource list
+  /vc/v1/list/deployments:
+    get:
+      consumes:
+        - application/json
+      description: get vcluster all deployments
+      parameters:
+        - description: 用户 JWT token
+          in: header
+          name: X-Access-Token
+          required: true
+          type: string
+        - description: 集群id
+          in: query
+          name: id
+          required: true
+          type: string
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    items:
+                      $ref: '#/definitions/v1.Deployment'
+                    type: array
+                type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    type: string
+                type: object
+      summary: Get VCluster deploy
+      tags:
+        - resource list
+  /vc/v1/list/events:
+    get:
+      consumes:
+        - application/json
+      description: get vcluster all events
+      parameters:
+        - description: 用户 JWT token
+          in: header
+          name: X-Access-Token
+          required: true
+          type: string
+        - description: 集群id
+          in: query
+          name: id
+          required: true
+          type: string
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    items:
+                      $ref: '#/definitions/v1.EventV1'
+                    type: array
+                type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    type: string
+                type: object
+      summary: Get VCluster event
+      tags:
+        - resource list
+  /vc/v1/list/ingress:
+    get:
+      consumes:
+        - application/json
+      description: get vcluster all ingress
+      parameters:
+        - description: 用户 JWT token
+          in: header
+          name: X-Access-Token
+          required: true
+          type: string
+        - description: 集群id
+          in: query
+          name: id
+          required: true
+          type: string
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    items:
+                      $ref: '#/definitions/v1.Ingress'
+                    type: array
+                type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    type: string
+                type: object
+      summary: Get VCluster ingress
+      tags:
+        - resource list
+  /vc/v1/list/namespaces:
+    get:
+      consumes:
+        - application/json
+      description: get vcluster all namespace
+      parameters:
+        - description: 用户 JWT token
+          in: header
+          name: X-Access-Token
+          required: true
+          type: string
+        - description: 集群id
+          in: query
+          name: id
+          required: true
+          type: string
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    items:
+                      $ref: '#/definitions/v1.Namespace'
+                    type: array
+                type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    type: string
+                type: object
+      summary: Get VCluster Namespace
+      tags:
+        - resource list
+  /vc/v1/list/pods:
+    get:
+      consumes:
+        - application/json
+      description: get vcluster all pods
+      parameters:
+        - description: 用户 JWT token
+          in: header
+          name: X-Access-Token
+          required: true
+          type: string
+        - description: 集群id
+          in: query
+          name: id
+          required: true
+          type: string
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    items:
+                      $ref: '#/definitions/v1.Pod'
+                    type: array
+                type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    type: string
+                type: object
+      summary: Get VCluster pods
+      tags:
+        - resource list
+  /vc/v1/list/pvc:
+    get:
+      consumes:
+        - application/json
+      description: get vcluster all pvc
+      parameters:
+        - description: 用户 JWT token
+          in: header
+          name: X-Access-Token
+          required: true
+          type: string
+        - description: 集群id
+          in: query
+          name: id
+          required: true
+          type: string
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    items:
+                      $ref: '#/definitions/v1.Pvc'
+                    type: array
+                type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    type: string
+                type: object
+      summary: Get VCluster pvc
+      tags:
+        - resource list
+  /vc/v1/list/resourcequotas:
+    get:
+      consumes:
+        - application/json
+      description: get vcluster all resourcequotas
+      parameters:
+        - description: 用户 JWT token
+          in: header
+          name: X-Access-Token
+          required: true
+          type: string
+        - description: 集群id
+          in: query
+          name: id
+          required: true
+          type: string
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    items:
+                      $ref: '#/definitions/v1.Resourcequotas'
+                    type: array
+                type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    type: string
+                type: object
+      summary: Get VCluster resourcequotas
+      tags:
+        - resource quota
+  /vc/v1/list/secrets:
+    get:
+      consumes:
+        - application/json
+      description: get vcluster all secret
+      parameters:
+        - description: 用户 JWT token
+          in: header
+          name: X-Access-Token
+          required: true
+          type: string
+        - description: 集群id
+          in: query
+          name: id
+          required: true
+          type: string
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    items:
+                      $ref: '#/definitions/v1.Secret'
+                    type: array
+                type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    type: string
+                type: object
+      summary: Get VCluster secret
+      tags:
+        - resource list
+  /vc/v1/list/services:
+    get:
+      consumes:
+        - application/json
+      description: get vcluster all service
+      parameters:
+        - description: 用户 JWT token
+          in: header
+          name: X-Access-Token
+          required: true
+          type: string
+        - description: 集群id
+          in: query
+          name: id
+          required: true
+          type: string
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    items:
+                      $ref: '#/definitions/v1.Service'
+                    type: array
+                type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    type: string
+                type: object
+      summary: Get VCluster service
+      tags:
+        - resource list
+  /vc/v1/list/statefulsets:
+    get:
+      consumes:
+        - application/json
+      description: get vcluster all statefulsets
+      parameters:
+        - description: 用户 JWT token
+          in: header
+          name: X-Access-Token
+          required: true
+          type: string
+        - description: 集群id
+          in: query
+          name: id
+          required: true
+          type: string
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    items:
+                      $ref: '#/definitions/v1.StatefulSet'
+                    type: array
+                type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    type: string
+                type: object
+      summary: Get VCluster statefulset
+      tags:
+        - resource list
+  /vc/v1/pause:
+    post:
+      consumes:
+        - application/json
+      description: pause vcluster
+      parameters:
+        - description: 用户 JWT token
+          in: header
+          name: X-Access-Token
+          required: true
+          type: string
+        - collectionFormat: csv
+          description: List of string ids
+          in: query
+          items:
+            type: string
+          name: ids
+          required: true
+          type: array
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    type: string
+                type: object
+      summary: pause VCluster
+      tags:
+        - pause
+  /vc/v1/profiles:
+    get:
+      consumes:
+        - application/json
+      description: get all profile info list
+      parameters:
+        - description: 用户 JWT token
+          in: header
+          name: X-token
+          required: true
+          type: string
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    $ref: '#/definitions/v1.ProductSpec'
+                type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    type: string
+                type: object
+      summary: List Profiles
+      tags:
+        - Profiles
+  /vc/v1/resume:
+    post:
+      consumes:
+        - application/json
+      description: resume vcluster
+      parameters:
+        - description: 用户 JWT token
+          in: header
+          name: X-Access-Token
+          required: true
+          type: string
+        - collectionFormat: csv
+          description: List of string ids
+          in: query
+          items:
+            type: string
+          name: ids
+          required: true
+          type: array
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    type: string
+                type: object
+      summary: resume VCluster
+      tags:
+        - resume
+  /vc/v1/token:
+    get:
+      consumes:
+        - application/json
+      description: create VCluster token
+      parameters:
+        - description: 用户 JWT token
+          in: header
+          name: X-Access-Token
+          required: true
+          type: string
+        - description: 集群id
+          in: query
+          name: id
+          required: true
+          type: string
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    $ref: '#/definitions/v1.KubeConfig'
+                type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+              - $ref: '#/definitions/response.BaseResponse'
+              - properties:
+                  data:
+                    type: string
+                type: object
+      summary: create VCluster token
+      tags:
+        - token
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"

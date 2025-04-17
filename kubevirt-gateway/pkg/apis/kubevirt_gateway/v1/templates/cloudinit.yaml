@@ -1,0 +1,26 @@
+#cloud-config
+disable_root: false
+ssh_pwauth: true
+{{if .UserName}}
+user: {{ .UserName }}
+password: {{ .PassWord }}
+{{end}}
+{{range .SshKeys}}
+ssh_authorized_keys:
+  - {{ . }}
+{{end}}
+package_update: true
+ackage_upgrade: true
+packages:
+  - net-tools
+write_files:
+- path: /etc/apt/sources.list
+  content: |
+    deb https://mirrors.aliyun.com/ubuntu/ jammy main restricted universe multiverse
+    deb-src https://mirrors.aliyun.com/ubuntu/ jammy main restricted universe multiverse
+    deb https://mirrors.aliyun.com/ubuntu/ jammy-security main restricted universe multiverse
+    deb-src https://mirrors.aliyun.com/ubuntu/ jammy-security main restricted universe multiverse
+    deb https://mirrors.aliyun.com/ubuntu/ jammy-updates main restricted universe multiverse
+    deb-src https://mirrors.aliyun.com/ubuntu/ jammy-updates main restricted universe multiverse
+    deb https://mirrors.aliyun.com/ubuntu/ jammy-backports main restricted universe multiverse
+    deb-src https://mirrors.aliyun.com/ubuntu/ jammy-backports main restricted universe multiverse"

@@ -1,0 +1,51 @@
+# 定义公共变量
+commonTolerations: &commonTolerations
+  tolerations:
+    - key: "dc.com/sys.node.base"
+      operator: "Equal"
+      value: "enable"
+      effect: "NoSchedule"
+    - key: "dc.com/sys.node.service"
+      operator: "Equal"
+      value: "enable"
+      effect: "NoSchedule"
+
+commonAffinity: &commonAffinity
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: "dc.com/sys.node.service"
+                operator: "In"
+                values:
+                  - "enable"
+              - key: "kubernetes.io/hostname"
+                operator: "NotIn"
+                values:
+                  - "k8s-unite-n4"
+
+# 使用公共变量
+syncer:
+  <<: *commonTolerations
+  <<: *commonAffinity
+
+etcd:
+  <<: *commonTolerations
+  <<: *commonAffinity
+
+controller:
+  <<: *commonTolerations
+  <<: *commonAffinity
+
+scheduler:
+  <<: *commonTolerations
+  <<: *commonAffinity
+
+api:
+  <<: *commonTolerations
+  <<: *commonAffinity
+
+coredns:
+  <<: *commonTolerations
+  <<: *commonAffinity

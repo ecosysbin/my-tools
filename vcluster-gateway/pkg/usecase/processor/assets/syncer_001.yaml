@@ -1,0 +1,6 @@
+syncer:
+  env:
+    - name: storage-1
+      value: cephfs-mix-aB3xYz9KlM7n
+    - name: instance-id
+      value: ff0bca82-6ccf-45b7-b944-79fa5f4a402b

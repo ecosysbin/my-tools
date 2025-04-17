@@ -1,0 +1,10 @@
+globalAnnotations:
+  FS-HDD/cephfs-mix-aB3xYz9KlM7n: limit
+  GCPManagerBy: aps-training
+  gcp-order-instanceId: ff0bca82-6ccf-45b7-b944-79fa5f4a402b
+  vcluster-describe: this is a desc
+  vcluster-name: lmlab06201856
+  vcluster-owner: aps001
+  vcluster-spec: '[{"ResourceSpecID":0,"ResourceSpecCode":"VC-MIX","ResourceSpecParamID":0,"ResourceSpecParamCode":"nvidia/mig-h800-pcie-3g.40gb","ParamName":"NVIDIA H800","ParamValue":"1"},{"ResourceSpecID":0,"ResourceSpecCode":"VC-MIX","ResourceSpecParamID":0,"ResourceSpecParamCode":"nvidia/mig-h800-pcie-2g.20gb","ParamName":"NVIDIA H800","ParamValue":"1"},{"ResourceSpecID":0,"ResourceSpecCode":"VC-MIX","ResourceSpecParamID":0,"ResourceSpecParamCode":"managed-by","ParamName":"纳管方","ParamValue":"aps-training"}]'
+  vcluster-tenantid: 52a8bad92ae4848c6e06b7b92233e8a9
+  zetyun-gpu-desc: nvidia/mig-h800-pcie-3g.40gb+nvidia/mig-h800-pcie-2g.20gb

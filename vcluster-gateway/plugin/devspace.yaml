@@ -1,0 +1,49 @@
+version: v2beta1
+name: hooks
+
+vars:
+  PLUGIN_IMAGE: ghcr.io/loft-sh/vcluster-hooks-plugin
+  K3S_IMAGE: rancher/k3s:v1.23.5-k3s1
+  SERVICE_CIDR: $( vcluster get service-cidr )
+  DEVSPACE_FLAGS: "-n vcluster"
+
+images:
+  vcluster:
+    image: ${PLUGIN_IMAGE}
+    dockerfile: ./Dockerfile.dev
+    rebuildStrategy: ignoreContextChanges
+
+deployments:
+  vcluster:
+    helm:
+      chart:
+        name: vcluster
+        repo: https://charts.loft.sh
+        version: 0.11.2
+      valuesFiles:
+        - plugin.yaml
+      values:
+        plugin:
+          hooks:
+            image: ${PLUGIN_IMAGE}
+        serviceCIDR: ${SERVICE_CIDR}
+        serviceAccount:
+          create: false
+          name: default
+        vcluster:
+          image: ${K3S_IMAGE}
+        rbac:
+          clusterRole:
+            create: true
+          role:
+            extended: true
+
+dev:
+  vcluster:
+    imageSelector: ${PLUGIN_IMAGE}
+    terminal:
+      command: ./devspace_start.sh
+    ports:
+    - port: 2346:2345
+    sync:
+    - path: ./:./

@@ -1,0 +1,3 @@
+etcd:
+  storage:
+    className: local-path

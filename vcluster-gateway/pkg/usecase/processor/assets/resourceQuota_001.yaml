@@ -1,0 +1,15 @@
+isolation:
+  enabled: true
+  resourceQuota:
+    enabled: true
+    quota:
+      cephfs-mix-aB3xYz9KlM7n.storageclass.storage.k8s.io/requests.storage: 64Gi
+      limits.cpu: 22
+      limits.memory: 131Gi
+      requests.cpu: 22
+      requests.memory: 131Gi
+      requests.nvidia.com/mig-h800-pcie-2g.20gb: 1
+      requests.nvidia.com/mig-h800-pcie-3g.40gb: 1
+      requests.storage: 119Gi
+      services.loadbalancers: 4
+      services.nodeports: 8

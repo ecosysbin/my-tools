@@ -1,0 +1,34 @@
+apiVersion: v1
+entries:
+  vcluster-k8s:
+  - apiVersion: v2
+    appVersion: 0.18.1
+    created: "2024-12-20T17:53:36.083663+08:00"
+    description: vcluster - Virtual Kubernetes Clusters (k8s)
+    digest: c8b6ab77c4c895aa21f8de77bc0ae1dd21c2fd7aa1e3a9bee4f3df377211dd04
+    home: https://vcluster.com
+    icon: https://static.loft.sh/branding/logos/vcluster/vertical/vcluster_vertical.svg
+    keywords:
+    - developer
+    - development
+    - sharing
+    - share
+    - multi-tenancy
+    - tenancy
+    - cluster
+    - space
+    - namespace
+    - vcluster
+    - vclusters
+    maintainers:
+    - email: info@loft.sh
+      name: Loft Labs, Inc.
+      url: https://twitter.com/loft_sh
+    name: vcluster-k8s
+    sources:
+    - https://github.com/loft-sh/vcluster
+    type: application
+    urls:
+    - vcluster-k8s-0.18.1.tgz
+    version: 0.18.1
+generated: "2024-12-20T17:53:36.082584+08:00"

@@ -1,0 +1,3 @@
+podLabels:
+  gcp.com/instance-id: ff0bca82-6ccf-45b7-b944-79fa5f4a402b
+  gcp.com/resource-type: vcluster

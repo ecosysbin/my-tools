@@ -1,0 +1,31 @@
+stages:
+  - pull-image
+  - lint
+
+pull-image-job:
+  stage: pull-image
+  image: public/golangci-lint:latest
+  services:
+    - docker:dind
+  variables:
+    DOCKER_TLS_CERTDIR: ""
+  script:
+    - echo "Logging into Docker Registry..."
+    - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" "$DOCKER_REGISTRY"
+    - echo "Pulling Docker image..."
+    - docker pull "$DOCKER_REGISTRY/public/golangci-lint:latest"
+    - echo "Pull success Docker image..."
+    - docker logout "$DOCKER_REGISTRY"
+
+# GolangCI-Lint job
+golangci-lint:
+  image: registry.hd-01.alayanew.com:8443/public/golangci-lint:latest  # 使用 GolangCI-Lint 官方 Docker 镜像
+  stage: lint
+  before_script:
+    - go mod tidy  # 确保依赖项是最新的
+  script:
+    - golangci-lint run --timeout 5m  # 执行 GolangCI-Lint 扫描，设置超时为5分钟
+  allow_failure: true  # 如果 GolangCI-Lint 扫描失败，流水线也会失败
+  only:
+    - merge_requests  # 只在合并请求时运行该 job
+    - develop  # 也可以在 `master` 分支上运行该 job

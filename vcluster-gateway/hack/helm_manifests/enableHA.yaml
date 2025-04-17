@@ -1,0 +1,14 @@
+enableHA: true
+
+replica_count: &replica_count 3
+
+etcd:
+  replicas: *replica_count
+api:
+  replicas: *replica_count
+controller:
+  replicas: *replica_count
+syncer:
+  replicas: *replica_count
+coredns:
+  replicas: *replica_count

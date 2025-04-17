@@ -1,0 +1,89 @@
+enableWatch: true
+
+server:
+  ip: ""
+  port: 8086
+  tokenKey: X-Access-Token
+  respCacheKey: ""
+  products:
+    DCX-CP4-1:
+      name: DCX-CP4-1
+      gpu_k8s_resource: "nvidia.com/GP104GL_TESLA_P4"
+      gpu_num: 1
+      mem: "32G"
+      cpu: "8"
+      amount: 2
+    DCX-CL40s-1:
+      name: DCX-CL40s-1
+      gpu_k8s_resource: "nvidia.com/GP104GL_TESLA_P4"
+      gpu_num: 1
+      mem: "32G"
+      cpu: "8"
+      amount: 0
+    DCX-CA100-1:
+      name: DCX-CA100-1
+      gpu_k8s_resource: "nvidia.com/GA100_A100_SXM4_80GB"
+      gpu_num: 1
+      mem: "32G"
+      cpu: "8"
+      amount: 0
+
+platformConfigPath: "D:\\gospace\\src\\gitlab.datacanvas.com\\kubevirt-gateway\\gcp.yaml"
+
+http:
+  kubeApiserver: "https://10.220.9.21:6443"
+  kubeConfig: "D:\\gospace\\src\\gitlab.datacanvas.com\\kubevirt-gateway\\tests\\config.txt"
+  # vncServer: "http://virtvnc.kubevirt.svc.cluster.local:8001"
+  vncServer: "http://10.220.9.21:62725"
+
+mysql:
+  pool_max: 2
+  url: 'kubevirt:DataCanvas!23@tcp(10.220.9.21:33060)/kubevirt?charset=utf8mb4&parseTime=True&loc=Local'
+
+storage:
+  min: 20
+  max: 1000
+  default: 100
+
+images:
+  imageFilePath: "/etc/images.json"
+
+products:
+  productFilePath: "/etc/products.json"
+
+casdoor:
+  endpoint: http://10.220.9.10:8000/
+  clientId: b73d12a8c2175c79ad9f
+  clientSecret: 1a92df8ccbbc68c49ebee076ffbabe5c7688e8ca
+  organizationName: GCP
+  applicationName: up
+  certificate: "-----BEGIN CERTIFICATE-----\n\
+MIIE3TCCAsWgAwIBAgIDAeJAMA0GCSqGSIb3DQEBCwUAMCgxDjAMBgNVBAoTBWFk\n\
+bWluMRYwFAYDVQQDEw1jZXJ0LWJ1aWx0LWluMB4XDTIzMTEzMDA3MjIxMloXDTQz\n\
+MTEzMDA3MjIxMlowKDEOMAwGA1UEChMFYWRtaW4xFjAUBgNVBAMTDWNlcnQtYnVp\n\
+bHQtaW4wggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoICAQC7jkDS2iDTibUx\n\
+DSext6Z2Um2a8kBGLfllqf7few3TDWX5JTLVq1fAzmLipcUuEHIH9AjUbKFmEFSn\n\
+iqigxpgoBQYi1JY72b8pN+kjgMkmXcSAZPotxoRTz3Dv3iz5QzSjjSc0aYyeV4Gy\n\
+rFHljgIqC8ypOpqiPpnR50+R7ARSHxpWQkuuh8Fgtq59sfrwMkaBTMeuY+NxsFAR\n\
+0chM+N3Pg6yAzPaf4cP7D+B/pHq/Xq8ZJvP9Apk/INX/ByDuUss+Bw75ysImVtHR\n\
+KRHkdXSABgOMHH9z1rMc9KpD/fdrQravSa5d901uQuUIb1Cpv4cF1iJIJC1784da\n\
+Tw0qm/wIkOKv9msUNSvrXNVgUo5whyMsbrv4XyUOY2mViQU1NtZRbNC8C9Fly7p/\n\
+GH9Xv456M7ZI3BwW4i/bFiZe4qqou7wjhpamQlmrEIwjBJcMIidl8GzhlLGb4Sus\n\
+jrIelcKcqeSd/nxVPjYNoG9N6he/Xcyu3Jukr/55pTCxo16tyf7L08CDcqOVl+DK\n\
+oj9UHtGUYolm1euRzPW789CTy+vK+mlA3ZL/bp+ACSMUTxmQXR0WOwRY/hvaKg5o\n\
+8mu9rgCdDdT4m7YLhSh+LxgBbg+7tGfV1ZjVnmC/FmHDfO/kUCeJsbxb1L5hARdU\n\
+/jYAym0SnaclEBfwTvrqTDSWXlp8nQIDAQABoxAwDjAMBgNVHRMBAf8EAjAAMA0G\n\
+CSqGSIb3DQEBCwUAA4ICAQBv1t5Shsmw73p75xwlYSjv0D8CoaeppCPQAU3pruko\n\
+0AVIR+4UNB+QoLkHbGIPOgfkc1ELq23bWWsKm3Vbn5mMjn9t0eEjEvPbYWe9pxaO\n\
+eBzdut2iDgFaXzwGs1a+eQ/gYSzIBVqMP5Voa5EYjyyDDfZWpTg6wdzgci/xWb0n\n\
+qNGnc81e3sjV+4jwN2vpf+4OBSeKcaGtmFgiqxA4gK8xO/pGriYX3hVC7pyPAy4+\n\
+0HWcM6ZB5KwjT6rhPxs1EfC7cd6ktT6NeXcbdu1/0tUxkiAQ/Tc5qhXdemhTyjPm\n\
+9kEuzj3TxLlI4ntD80kE7Y8PWBaQgULroQDYUJdOOgW8goliI5oZCOSYB4phR9gn\n\
+gpuzBsv1EK6K8ok9MMCaJeF1zhleJBXFfRAumrHCo5CzV4kGAGTep0T3SgZLjLgz\n\
+x1HYe7Z4cTXFHIUVMvdanIWJWxJCWM6RAr3bhHi/Rk4Se1soCIg9PuFGSNGcQycv\n\
+fxhl82XTnLQAEuNJ8o3VZrpMFNRaKFUyjSGZVjstDg7j56k/NbhR2TCWVFvD0i7V\n\
+kj3JagdMMs9ylnK1wIvF+Jy6PgqEQA5OEDNCEbdMBEUL9ZNANGXmUgD8K98ebNjV\n\
+kDP3EJQX/5qVk0lxp/kzxHF6jwTpshJB55Xtivj7ow4V7+dmorAuRM9tPrG+LW8B\n\
+Cg==\n\
+-----END CERTIFICATE-----\n\
+"

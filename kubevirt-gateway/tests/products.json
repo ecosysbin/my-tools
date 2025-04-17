@@ -1,0 +1,166 @@
+{
+    "product_categories": [
+      {
+        "code": "CP4",
+        "value": "NVIDIA P4",
+        "seq": "1"
+      },
+      {
+        "code": "CA100",
+        "value": "NVIDIA A100",
+        "seq": "2"
+      },
+      {
+        "code": "CH800",
+        "value": "NVIDIA H800 SXM",
+        "seq": "3"
+      },
+      {
+        "code": "CA800-pcie",
+        "value": "NVIDIA A800 PCIe",
+        "seq": "4"
+      },
+      {
+        "code": "CL40s",
+        "value": "NVIDIA L40s",
+        "seq": "5"
+      }
+    ],
+    "products": [
+      {
+        "code": "DCX-CP4-1",
+        "name": "产品1",
+        "category": "CP4",
+        "configs": [
+          {
+            "configKey": "gpu_type",
+            "configValue": "Nvidia Tesla p4"
+          },
+          {
+            "configKey": "gpu_quantity",
+            "configValue": 1
+          },
+          {
+            "configKey": "gpu_mem",
+            "configValue": "8G"
+          },
+          {
+            "configKey": "mem",
+            "configValue": "32G"
+          },
+          {
+            "configKey": "cpu",
+            "configValue": 8
+          }
+        ]
+      },
+      {
+        "code": "DCX-CA100-1",
+        "name": "产品2",
+        "category": "CA100",
+        "configs": [
+          {
+            "configKey": "gpu_type",
+            "configValue": "Nvidia A100"
+          },
+          {
+            "configKey": "gpu_quantity",
+            "configValue": 1
+          },
+          {
+            "configKey": "gpu_mem",
+            "configValue": "40G"
+          },
+          {
+            "configKey": "mem",
+            "configValue": "32G"
+          },
+          {
+            "configKey": "cpu",
+            "configValue": 8
+          }
+        ]
+      },
+      {
+        "code": "DCX-CA800-1",
+        "name": "产品3",
+        "category": "CA800",
+        "configs": [
+          {
+            "configKey": "gpu_type",
+            "configValue": "Nvidia A800 SXM"
+          },
+          {
+            "configKey": "gpu_quantity",
+            "configValue": 1
+          },
+          {
+            "configKey": "gpu_mem",
+            "configValue": "80G"
+          },
+          {
+            "configKey": "mem",
+            "configValue": "32G"
+          },
+          {
+            "configKey": "cpu",
+            "configValue": 8
+          }
+        ]
+      },
+      {
+        "code": "DCX-CH800-1",
+        "name": "产品4",
+        "category": "CH800",
+        "configs": [
+          {
+            "configKey": "gpu_type",
+            "configValue": "Nvidia H800 SXM"
+          },
+          {
+            "configKey": "gpu_quantity",
+            "configValue": 1
+          },
+          {
+            "configKey": "gpu_mem",
+            "configValue": "80G"
+          },
+          {
+            "configKey": "mem",
+            "configValue": "32G"
+          },
+          {
+            "configKey": "cpu",
+            "configValue": 8
+          }
+        ]
+      },
+      {
+        "code": "DCX-CL40s-1",
+        "name": "产品4",
+        "category": "CL40s",
+        "configs": [
+          {
+            "configKey": "gpu_type",
+            "configValue": "Nvidia CL40s SXM"
+          },
+          {
+            "configKey": "gpu_quantity",
+            "configValue": 1
+          },
+          {
+            "configKey": "gpu_mem",
+            "configValue": "80G"
+          },
+          {
+            "configKey": "mem",
+            "configValue": "32G"
+          },
+          {
+            "configKey": "cpu",
+            "configValue": 8
+          }
+        ]
+      }
+    ]
+  }

@@ -1,0 +1,53 @@
+{
+    "vmimage_categories": [
+      {
+        "code": "ubuntu",
+        "value": "Ubuntu",
+        "seq": "1"
+      },
+      {
+        "code": "centos",
+        "value": "CentOs",
+        "seq": "2"
+      },
+      {
+        "code": "redHat",
+        "value": "Red Hat",
+        "seq": "3"
+      }
+    ],
+    "vmimages": [
+      {
+        "imageName": "aidc-ubuntu-20.04-server-cloudimg-amd64-wfdsgsfb",
+        "category": "ubuntu",
+        "config": {
+          "gpudriver": "470.239.06",
+          "cuda": "11.4"
+        }
+      },
+      {
+        "imageName": "aidc-ubuntu-22.04-server-cloudimg-amd64-undmkhnd",
+        "category": "ubuntu",
+        "config": {
+          "gpudriver": "545.29.06",
+          "cuda": "12.3"
+        }
+      },
+      {
+        "imageName": "aidc-centos-7-generic-cloud-crgsgsdh",
+        "category": "centos",
+        "config": {
+          "gpudriver": "515.65.01",
+          "cuda": "11.7"
+        }
+      },
+      {
+        "imageName": "aidc-centos-8-generic-cloud-cgkdmtib",
+        "category": "centos",
+        "config": {
+          "gpudriver": "510.47.03",
+          "cuda": "11.6"
+        }
+      }
+    ]
+}

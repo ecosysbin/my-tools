@@ -1,0 +1,113 @@
+#
+# Copyright 2023 The Zetyun.GCP Authors.
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+SHELL = bash
+
+# Base Variables.
+REPO = $(shell go list -m)
+LOGLEVEL ?= debug
+
+CONFIGPATH ?= ./config.yaml
+GCP_CONFIG_PATH ?= ./gcp.yaml
+
+# Variables of Images.
+IMAGE_REPO ?= harbor.zetyun.cn/gcp
+IMAGE_NAME ?= kubevirt-gateway
+IMAGE_TAG ?= v0.0.0
+
+# Variables of go build args and docker build args.
+VERSION = $(IMAGE_TAG)
+GIT_COMMIT = $(shell git rev-parse --short=11 HEAD)
+DATE=`date "+%Y-%m-%d %H:%M:%S"`
+
+# Generate go build args.
+GO_BUILD_ARGS = \
+	-w \
+	-X '$(REPO)/pkg/version.Version=$(VERSION)' \
+	-X '$(REPO)/pkg/version.GitCommit=$(GIT_COMMIT)' \
+	-X '$(REPO)/pkg/version.BuildAt=$(DATE)' \
+
+# Generate docker build args.
+BUILD_ARGS= \
+	--build-arg GO_BUILD_ARGS="$(GO_BUILD_ARGS)" \
+
+##@ Build
+
+#@ The targets of Build build and push images.
+#@ Tags IMAGE_REPO IMAGE_NAME IMAGE_TAG can be overwrite.
+#@ Examples:
+#@     Build image with tag 'IMAGE_TAG'.
+#@     - make docker-build IMAGE_TAG=v0.0.1
+#@     Build image with all tags.
+#@     - make docker-build IMAGE_REPO=<image-repo> IMAGE_NAME=<image-name> IMAGE_TAG=v0.0.1
+#@     Build image and push with all tags.
+#@     - make build-push IMAGE_REPO=<image-repo> IMAGE_NAME=<image-name> IMAGE_TAG=v0.0.1
+#@
+
+.PHONY: build-push
+build-push: docker-build docker-push ## Build and push image to the harbor.
+
+.PHONY: docker-build
+docker-build: ## Build the docker image.
+	docker build $(BUILD_ARGS) -t $(IMAGE_REPO)/$(IMAGE_NAME):$(IMAGE_TAG) .
+
+.PHONY: docker-push
+docker-push: ## Push the docker image.
+	docker push $(IMAGE_REPO)/$(IMAGE_NAME):$(IMAGE_TAG)
+
+.PHONY: bin-darwin
+bin-darwin: ## Build a binary file for macOS.
+	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -mod=vendor -ldflags "$(GO_BUILD_ARGS)" -o build/bin/kubevirt-gateway-gateway cmd/kubevirt-gateway.go
+
+.PHONY: bin-linux
+bin-linux: ## Build a binary file for linux.
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -mod=vendor -ldflags "$(GO_BUILD_ARGS)" -o build/bin/kubevirt-gateway-gateway cmd/kubevirt-gateway.go
+
+##@ Deployment
+
+.PHONY: install-swag
+install-swag: ## Install swag tool.
+	go install github.com/swaggo/swag/cmd/swag@latest
+
+.PHONY: swag
+swag: ## Format swag annotations and init or update swagger docs.
+	swag fmt
+	swag init -g cmd/kubevirt_gateway.go
+
+.PHONY: tidy
+tidy: ## Update dependencies and packages in vendor.
+	go mod tidy
+	go mod vendor
+
+.PHONY: run
+run: ## Run tests locally.
+	go run -mod=vendor cmd/kubevirt_gateway.go --config=$(CONFIGPATH)  --gcp-config=$(GCP_CONFIG_PATH) --log-level=$(LOGLEVEL)
+
+##@ General
+
+# The help target prints out all targets with their descriptions organized
+# beneath their categories. The categories are represented by '##@' and the
+# target descriptions by '##'. The awk commands is responsible for reading the
+# entire set of makefiles included in this invocation, looking for lines of the
+# file as xyz: ## something, and then pretty-format the target and help. Then,
+# if there's a line with ##@ something, that gets pretty-printed as a category.
+# More info on the usage of ANSI control characters for terminal formatting:
+# https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_parameters
+# More info on the awk command:
+# http://linuxcommand.org/lc3_adv_awk.php
+
+help: ## Show the targets Usage which in the Makefile.
+	@awk 'BEGIN {FS = ":.*##"; printf "\033[1mUsage:\033[0m\n  \033[3mmake\033[0m \033[3;36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1;4m%s\033[0m\n", substr($$0, 5) } /^#@/ { printf "    \033[3;32m%s\033[0m\n", substr($$0, 4) } ' $(MAKEFILE_LIST)

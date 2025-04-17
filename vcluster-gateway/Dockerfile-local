@@ -1,0 +1,46 @@
+#
+# Copyright 2023 The Zetyun.GCP Authors.
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+#FROM harbor.zetyun.cn/gcp/golang-alpine3.19-tini:1.22.1 as builder
+FROM harbor.zetyun.cn/gcp/golang-alpine3.19-tini:1.21.5 as builder
+WORKDIR /workspace
+
+ENV GOPROXY  https://goproxy.cn,direct
+
+RUN wget http://harbor.zetyun.cn:9000/aidc/helm && \
+    chmod +x helm && \
+    mv helm /usr/local/bin/helm
+
+COPY charts/vcluster-k8s charts/vcluster-k8s
+
+#ENV GOINSECURE gitlab.datacanvas.com,git@gitlab.datacanvas.com
+#ENV GONOPROXY gitlab.datacanvas.com/*,git@gitlab.datacanvas.com/*
+#ENV GONOSUMDB gitlab.datacanvas.com,git@gitlab.datacanvas.com
+#ENV GOPRIVATE gitlab.datacanvas.com/*,git@gitlab.datacanvas.com/*
+
+
+COPY . .
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+FROM harbor.zetyun.cn/gcp/ubuntu-tini:22.04
+
+COPY --from=builder /workspace/vcluster-gateway .
+COPY --from=builder /workspace/hack ./hack
+COPY --from=builder /usr/local/bin/helm /usr/local/bin/helm
+COPY --from=builder /workspace/charts/vcluster-k8s ./charts/vcluster-k8s
+
+ENTRYPOINT [ "/usr/bin/tini", "--", "./vcluster-gateway", "start" ]

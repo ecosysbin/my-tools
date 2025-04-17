@@ -1,0 +1,758 @@
+definitions:
+  response.BaseResponse:
+    properties:
+      data: {}
+      msg:
+        type: string
+      status:
+        type: integer
+    type: object
+  v1.BSMVirtualServerReq:
+    properties:
+      cloudinit:
+        $ref: '#/definitions/v1.CloudInit'
+      desc:
+        type: string
+      image:
+        type: string
+      instanceId:
+        type: string
+      name:
+        type: string
+      productConfig:
+        items:
+          $ref: '#/definitions/v1.productConfig'
+        type: array
+      productInfo:
+        $ref: '#/definitions/v1.productInfo'
+      storage:
+        $ref: '#/definitions/v1.Storage'
+    required:
+    - desc
+    - image
+    - instanceId
+    - name
+    - productConfig
+    - productInfo
+    type: object
+  v1.CloudInit:
+    properties:
+      pwd:
+        type: string
+      sshkeys:
+        items:
+          type: string
+        type: array
+      user:
+        type: string
+    type: object
+  v1.FailedStatus:
+    properties:
+      message:
+        type: string
+      reason:
+        type: string
+    type: object
+  v1.OSMVirtualServerReq:
+    properties:
+      cloudinit:
+        $ref: '#/definitions/v1.CloudInit'
+      desc:
+        type: string
+      image:
+        type: string
+      name:
+        type: string
+      productInfo:
+        $ref: '#/definitions/v1.productInfo'
+      storage:
+        $ref: '#/definitions/v1.Storage'
+    required:
+    - desc
+    - image
+    - name
+    - productInfo
+    type: object
+  v1.Profile:
+    properties:
+      desc:
+        type: string
+      name:
+        type: string
+    type: object
+  v1.State:
+    properties:
+      domainName:
+        type: string
+      failedStatus:
+        allOf:
+        - $ref: '#/definitions/v1.FailedStatus'
+        description: 出错时返回
+      instanceId:
+        type: string
+      sshPort:
+        type: integer
+      status:
+        type: string
+      vnc:
+        type: string
+    type: object
+  v1.Storage:
+    properties:
+      dataStorage:
+        items:
+          $ref: '#/definitions/v1.StorageEntity'
+        type: array
+      systemStorage:
+        $ref: '#/definitions/v1.StorageEntity'
+    required:
+    - dataStorage
+    - systemStorage
+    type: object
+  v1.StorageEntity:
+    properties:
+      capacity:
+        type: integer
+      isNew:
+        type: boolean
+      pvcName:
+        type: string
+      releaseWithInstance:
+        description: 默认为false
+        type: boolean
+      storageClass:
+        type: string
+    required:
+    - isNew
+    - releaseWithInstance
+    type: object
+  v1.VirtualServer:
+    properties:
+      cloudinit:
+        $ref: '#/definitions/v1.CloudInit'
+      createTime:
+        type: string
+      deleteTime:
+        type: string
+      desc:
+        type: string
+      image:
+        type: string
+      name:
+        type: string
+      productCode:
+        type: string
+      startedTime:
+        type: string
+      state:
+        allOf:
+        - $ref: '#/definitions/v1.State'
+        description: 创建时无需下发，查询时需要返回
+      storage:
+        $ref: '#/definitions/v1.Storage'
+    required:
+    - desc
+    - image
+    - name
+    - productCode
+    type: object
+  v1.productConfig:
+    properties:
+      configKey:
+        type: string
+      configValue:
+        type: string
+    required:
+    - configKey
+    - configValue
+    type: object
+  v1.productInfo:
+    properties:
+      productCode:
+        type: string
+    required:
+    - productCode
+    type: object
+host: localhost:8890
+info:
+  contact: {}
+  description: This is an authorization authentication proxy service.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: GCP Kubevirt Gateway API
+  version: "1.0"
+paths:
+  /api/kvm/v1/bsm-virtualserver:
+    post:
+      consumes:
+      - application/json
+      description: Create BSM VirtualServer
+      parameters:
+      - description: 用户 JWT token
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      - description: 云服务器创建参数
+        in: body
+        name: post
+        required: true
+        schema:
+          $ref: '#/definitions/v1.BSMVirtualServerReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Create BSM VirtualServer
+      tags:
+      - virtualserver
+  /api/kvm/v1/image-profiles:
+    get:
+      consumes:
+      - application/json
+      description: List Image profiles
+      parameters:
+      - description: 用户 JWT token
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/v1.Profile'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: List Image profiles
+      tags:
+      - Profiles
+  /api/kvm/v1/product-profiles:
+    get:
+      consumes:
+      - application/json
+      description: List Product Profiles
+      parameters:
+      - description: 用户 JWT token
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/v1.Profile'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: List Product Profiles
+      tags:
+      - Profiles
+  /api/kvm/v1/product/available:
+    get:
+      consumes:
+      - application/json
+      description: get products available amount
+      parameters:
+      - description: 用户 JWT token
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/v1.Profile'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get Products available amount
+      tags:
+      - Profiles
+  /api/kvm/v1/storage-profiles:
+    get:
+      consumes:
+      - application/json
+      description: List Storage profiles
+      parameters:
+      - description: 用户 JWT token
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/v1.Profile'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: List Storage profiles
+      tags:
+      - Profiles
+  /api/kvm/v1/virtualserver:
+    post:
+      consumes:
+      - application/json
+      description: Create OSM VirtualServer
+      parameters:
+      - description: 用户 JWT token
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      - description: 云服务器创建参数
+        in: body
+        name: post
+        required: true
+        schema:
+          $ref: '#/definitions/v1.OSMVirtualServerReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Create OSM VirtualServer
+      tags:
+      - virtualserver
+  /api/kvm/v1/virtualserver/{virtualserver.instanceId}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete VirtualServer
+      parameters:
+      - description: 用户 JWT token
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Delete VirtualServer
+      tags:
+      - virtualserver
+    get:
+      consumes:
+      - application/json
+      description: Get VirtualServer
+      parameters:
+      - description: 用户 JWT token
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/v1.VirtualServer'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get VirtualServer
+      tags:
+      - virtualserver
+  /api/kvm/v1/virtualserver/{virtualserver.instanceId}/bind/storage/{volume.name}:
+    post:
+      consumes:
+      - application/json
+      description: Bind Volume
+      parameters:
+      - description: 用户 JWT token
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Bind Volume
+      tags:
+      - virtualserver
+  /api/kvm/v1/virtualserver/{virtualserver.instanceId}/restart:
+    get:
+      consumes:
+      - application/json
+      description: Restart VirtualServer
+      parameters:
+      - description: 用户 JWT token
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Restart VirtualServer
+      tags:
+      - virtualserver
+  /api/kvm/v1/virtualserver/{virtualserver.instanceId}/start:
+    get:
+      consumes:
+      - application/json
+      description: Start VirtualServer
+      parameters:
+      - description: 用户 JWT token
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Start VirtualServer
+      tags:
+      - virtualserver
+  /api/kvm/v1/virtualserver/{virtualserver.instanceId}/stop:
+    get:
+      consumes:
+      - application/json
+      description: Stop VirtualServer
+      parameters:
+      - description: 用户 JWT token
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: StopVirtualServer
+      tags:
+      - virtualserver
+  /api/kvm/v1/virtualserver/{virtualserver.instanceId}/unbind/storage/{volume.name}:
+    post:
+      consumes:
+      - application/json
+      description: Remove Volume
+      parameters:
+      - description: 用户 JWT token
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Remove Volume
+      tags:
+      - virtualserver
+  /api/kvm/v1/virtualservers:
+    get:
+      consumes:
+      - application/json
+      description: List VirtualServers
+      parameters:
+      - description: 用户 JWT token
+        in: header
+        name: X-Access-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/v1.VirtualServer'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: List VirtualServers
+      tags:
+      - virtualserver
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"

@@ -1,0 +1,11 @@
+# we use alpine for easier debugging
+FROM alpine
+
+# Set root path as working directory
+WORKDIR /
+
+COPY plugin plugin
+
+RUN chmod +x plugin
+
+ENTRYPOINT ["/plugin"]

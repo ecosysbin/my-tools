@@ -1,0 +1,56 @@
+{{- $scList := .Values.zetyun.storageclass.list }}
+{{- $relname := .Release.Name -}}
+{{- $relnamespace := .Release.Namespace -}}
+{{- $cephClusterId := .Values.zetyun.storageclass.clusterId -}}
+{{- range $index, $sc := $scList }}
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: {{ $sc.name }}-{{ $relname }} 
+  namespace: {{ $relnamespace }} 
+provisioner: cephfs.csi.ceph.com
+parameters:
+  clusterID: {{ $cephClusterId }}
+  {{- if eq $sc.type "aps" }}
+  fsName: aps-{{ $sc.name }}
+  pool: aps-{{ $sc.name }}-data
+  csi.storage.k8s.io/provisioner-secret-name: aps-{{ $sc.name }}-secret
+  csi.storage.k8s.io/provisioner-secret-namespace: {{ $sc.ns }}
+  csi.storage.k8s.io/controller-expand-secret-name: aps-{{ $sc.name }}-secret
+  csi.storage.k8s.io/controller-expand-secret-namespace: {{ $sc.ns }}
+  csi.storage.k8s.io/node-stage-secret-name: aps-{{ $sc.name }}-secret
+  csi.storage.k8s.io/node-stage-secret-namespace: {{ $sc.ns }}
+  volumeNamePrefix: aps-{{ $relname }}-
+  {{- else if eq $sc.type "alaya-studio" }}
+  fsName: alaya-{{ $sc.name }}
+  pool: alaya-{{ $sc.name }}-data
+  csi.storage.k8s.io/provisioner-secret-name: alaya-{{ $sc.name }}-secret
+  csi.storage.k8s.io/provisioner-secret-namespace: {{ $sc.ns }}
+  csi.storage.k8s.io/controller-expand-secret-name: alaya-{{ $sc.name }}-secret
+  csi.storage.k8s.io/controller-expand-secret-namespace: {{ $sc.ns }}
+  csi.storage.k8s.io/node-stage-secret-name: alaya-{{ $sc.name }}-secret
+  csi.storage.k8s.io/node-stage-secret-namespace: {{ $sc.ns }}
+  volumeNamePrefix: alaya-{{ $relname }}-
+  {{- else }}
+  fsName: gcp-{{ $sc.name }}
+  pool: gcp-{{ $sc.name }}-data
+  csi.storage.k8s.io/provisioner-secret-name: gcp-{{ $sc.name }}-secret
+  csi.storage.k8s.io/provisioner-secret-namespace: {{ $sc.ns }}
+  csi.storage.k8s.io/controller-expand-secret-name: gcp-{{ $sc.name }}-secret
+  csi.storage.k8s.io/controller-expand-secret-namespace: {{ $sc.ns }}
+  csi.storage.k8s.io/node-stage-secret-name: gcp-{{ $sc.name }}-secret
+  csi.storage.k8s.io/node-stage-secret-namespace: {{ $sc.ns }}
+  volumeNamePrefix: raw-{{ $relname }}-
+  {{- end }}
+{{- if eq $sc.type "aps" }}
+reclaimPolicy: Retain
+{{- else }}
+reclaimPolicy: Delete
+{{- end }}
+allowVolumeExpansion: true
+  #mountOptions:
+  #  - discard
+  #  - ms_mode=secure
+  #
+{{- end }}
+

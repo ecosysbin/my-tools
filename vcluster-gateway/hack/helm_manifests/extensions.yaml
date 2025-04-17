@@ -1,0 +1,4 @@
+# 创建 vcluster 执行 helm install/upgrade 命令，并指定 values.yaml 文件时，会将 extensions.yaml 作为最后一个文件传递
+# 用在不重启 pod 时，对创建 vcluster 操作做一些扩展
+
+#foo: bar

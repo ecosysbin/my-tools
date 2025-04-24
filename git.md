@@ -20,10 +20,27 @@ git clean -fd
 git checkout origin/dev
 ```
 
+## 恢复已进入缓存区的文件
+git restore --staged installer/helm/chart/volcano/charts/jobflow/crd/v1
+
+## 进一步从红区恢复
+git restore installer/helm/chart/volcano/crd/v1
+
 ## 创建并切换到本地新分支
 ```
 git checkout -b dev
 ```
+
+## 直接将远端分支覆盖本地分支（远程分支将覆盖到本地，需要git checkout -b创建一个新分支进行接收）
+git reset vocalno/network-topology --hard
+
+## 用一个分支覆盖另一个分支
+git checkout rescheduler目标分支
+git reset origin/supportlabel --hard
+git push -f origin rescheduler
+
+## 暴力结束rebase的状态
+rm -fr ".git/rebase-merge"
 
 ## 删除本地分支
 ```
@@ -135,3 +152,17 @@ git reset --hard temp  # 强制将 network-topology 分支重置为 temp 分支�
 7. github 将远端仓库的clone到本地仓库，假设最终要向远程xxx分支提交代码，本地不建议直接在xxx分支提交代码。这样假如有多个特性开发则都可以从xxx分支checkout进行开发。
 
 8. github提交pending的评论
+
+9. 按照一定格式输出git log
+git log --abbrev-commit --abbrev=12 --date=format:"%Y%m%d%H%M%S"
+
+10. github pr的commit一直pengding，需要统一commit.
+fileChanges -> Review changes -> Submit review
+
+11. 代码显示如下状态，推送不了，使用head方式推送（git push -f origin head:network-topology）
+```
+D:\workspace\github.com\volcano>git status
+HEAD detached from origin/network-topology
+nothing to commit, working tree clean
+
+```

@@ -8,7 +8,7 @@ package vclusterv1
 
 import (
 	_ "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options"
-	_ "gitlab.datacanvas.com/AlayaNeW/OSM/gokit/genproto/gcpapis/http/v1"
+	// _ "gitlab.datacanvas.com/AlayaNeW/OSM/gokit/genproto/gcpapis/http/v1"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"

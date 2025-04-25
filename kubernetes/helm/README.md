@@ -12,6 +12,13 @@ helm install kube-ovn kubeovn/kube-ovn
 helm install kube-ovn kubeovn/kube-ovn -f ./values.yaml
 helm install openebs openebs/openebs -f ./values.yaml --namespace kube-public
  
+# 使用已下载的helm软件包进行安装
+1. 下载软件包
+helm pull ingress-nginx/ingress-nginx
+2. 解压，并修改values.yaml文件
+3. 安装
+helm install ingress-nginx ingress-nginx -f ingress-nginx/values.yaml --namespace ingress
+
 # 下载软件包
 helm pull kubeovn/kube-ovn
 

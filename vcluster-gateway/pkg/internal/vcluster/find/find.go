@@ -19,7 +19,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd/api"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"gitlab.datacanvas.com/AlayaNeW/OSM/gokit/log"
+	log "github.com/sirupsen/logrus"
 )
 
 const VirtualClusterSelector = "app=vcluster"

@@ -8,9 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	gcplog "gitlab.datacanvas.com/AlayaNeW/OSM/gokit/log"
-
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 
 	v1 "gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/apis/config/vcluster_gateway/v1"
@@ -26,7 +25,7 @@ type PreprocessFunc func(*v1.VClusterInfo)
 type SetterFunc func(from *v1.VClusterInfo, to *models.Values)
 
 type HelmValuesProcessor struct {
-	Logger *gcplog.Logger
+	Logger *log.Logger
 
 	Values        *models.Values
 	Preprocessors []PreprocessFunc
@@ -39,7 +38,7 @@ func NewHelmValuesProcessor() *HelmValuesProcessor {
 	}
 }
 
-func (p *HelmValuesProcessor) SetProcessorLogger(logger *gcplog.Logger) {
+func (p *HelmValuesProcessor) SetProcessorLogger(logger *log.Logger) {
 	p.Logger = logger
 }
 
@@ -483,7 +482,7 @@ func (p *HelmValuesProcessor) GenerateValuesFile(vclusterId string) (filename st
 }
 
 // WriteToTempFile 将给定的 YAML 内容写入临时文件
-func WriteToTempFile(content *string, vclusterId string, logger *gcplog.Logger) (filename string, err error) {
+func WriteToTempFile(content *string, vclusterId string, logger *log.Logger) (filename string, err error) {
 	// 将 Values 写入一个临时文件
 	tempFile, err := os.CreateTemp("", fmt.Sprintf(valuesFileTemplate, vclusterId))
 	if err != nil {

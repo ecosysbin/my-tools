@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 
 	v1 "gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/apis/config/vcluster_gateway/v1"
 	vclusterv1 "gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/apis/grpc/gen/datacanvas/gcp/osm/vcluster_1.1/v1"
@@ -77,7 +78,7 @@ func (vcc *VClusterController) CreateVCluster(params *v1.CreateVClusterParams) (
 		info.Comment = params.Desc
 	}
 
-	info.Logger = info.Logger.WithField("name", info.Name).WithField("comment", info.Comment)
+	info.Logger = log.New()
 
 	resp, err := vcc.useCase.CreateVCluster(context.Background(), info)
 	if err != nil {
@@ -167,7 +168,7 @@ func (vcc *VClusterController) UpdateVCluster(params *v1.UpdateVClusterParams) (
 		info.Comment = params.Desc
 	}
 
-	info.Logger = info.Logger.WithField("name", info.Name).WithField("comment", info.Comment)
+	info.Logger = log.New()
 
 	resp, err := vcc.useCase.UpdateVCluster(context.Background(), info)
 	if err != nil {

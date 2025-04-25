@@ -35,7 +35,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/clientcmd/api"
 
-	"gitlab.datacanvas.com/AlayaNeW/OSM/gokit/log"
+	log "github.com/sirupsen/logrus"
 )
 
 // var _ framework.ComponentConfigInterface = &VclusterGatewayConfiguration{}

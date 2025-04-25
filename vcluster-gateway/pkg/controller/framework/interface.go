@@ -29,21 +29,12 @@ import (
 	"gorm.io/gorm"
 	"k8s.io/client-go/informers"
 
-	gcpauthz "gitlab.datacanvas.com/AlayaNeW/OSM/gokit/authz"
-	"gitlab.datacanvas.com/AlayaNeW/OSM/gokit/connectrpc/interceptors"
-	gcpctx "gitlab.datacanvas.com/AlayaNeW/OSM/gokit/gin/context"
-
 	configv1 "gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/apis/config/vcluster_gateway/v1"
 	v1 "gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/apis/config/vcluster_gateway/v1"
 	vclusterv1 "gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/apis/grpc/gen/datacanvas/gcp/osm/vcluster_1.1/v1"
 )
 
 type Interface interface {
-	CasdoorInterface
-	GCPAuthzInterface
-
-	interceptors.Interceptors
-
 	DIContainer() DIContainerInterface
 
 	HttpClient() *resty.Client
@@ -103,25 +94,9 @@ type ComponentConfigInterface interface {
 	GetVclusterGatewayConductorTaskRunner() *worker.TaskRunner
 }
 
-type MiddlewareInterfaceOptions func(*gcpctx.GCPContext) bool
-
-type MiddlewareInterface interface {
-	ParseUserToken(filterOpts ...MiddlewareInterfaceOptions) gcpctx.GCPContextHandlerFunc
-}
-
 type CasdoorInterface interface {
 	ParseJwtToken(ctx context.Context, tokenString string) (*casdoorsdk.Claims, error)
 	ResetJwkSet(ctx context.Context) error
-}
-
-type GCPAuthzInterface interface {
-	IsAllowed(policies []gcpauthz.Policy, ctx gcpauthz.Authzable) gcpauthz.AuthResult
-	ParsePoliciesFromJSON(data []byte) ([]gcpauthz.Policy, error)
-}
-
-// Handlers Interface
-type WebHandlerInterface interface {
-	ListProfiles(c *gcpctx.GCPContext)
 }
 
 type ReverseProxyHandlerInterface interface{}

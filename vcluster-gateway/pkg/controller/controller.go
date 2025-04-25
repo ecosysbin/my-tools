@@ -24,21 +24,15 @@ import (
 	"net/http"
 	"time"
 
-	"connectrpc.com/connect"
 	"github.com/gin-gonic/gin"
 	"github.com/go-resty/resty/v2"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
-
-	"gitlab.datacanvas.com/AlayaNeW/OSM/gokit/authz"
-	"gitlab.datacanvas.com/AlayaNeW/OSM/gokit/casdoor"
-	"gitlab.datacanvas.com/AlayaNeW/OSM/gokit/connectrpc/interceptors"
-	"gitlab.datacanvas.com/AlayaNeW/OSM/gokit/connectrpc/interceptors/authentication"
-	"gitlab.datacanvas.com/AlayaNeW/OSM/gokit/log"
 
 	v1 "gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/apis/config/vcluster_gateway/v1"
 	vclusterv1 "gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/apis/grpc/gen/datacanvas/gcp/osm/vcluster_1.1/v1"
@@ -55,15 +49,8 @@ var _ framework.Interface = &Controller{}
 type Controller struct {
 	cfg *controllerConfiguration
 
-	// controllers
-	*casdoor.CasdoorController
-	*authz.GcpAuthorization
-
 	vClusterController *vcluster.VClusterController
-
-	diContainer *dicontainer.DIContainer
-
-	interceptors.Interceptors
+	diContainer        *dicontainer.DIContainer
 
 	// servers
 	vclusterServer *services.VClusterServer
@@ -79,9 +66,6 @@ func New(opts ...Option) *Controller {
 	for _, opt := range opts {
 		opt(&c)
 	}
-
-	// conductorController := conductor.NewConductorController(c.componentConfig.Conductor.ApiClient)
-	// conductorController.InitMetadataDefinitions()
 
 	controller := Controller{
 		cfg: &c,
@@ -101,25 +85,7 @@ func New(opts ...Option) *Controller {
 
 	controller.diContainer = dicontainer.NewDIContainer(&controller)
 
-	// Init controllers
-	casdoorController, err := casdoor.New(&casdoor.CasdoorControllerConfiguration{Endpoint: c.componentConfig.Casdoor.Endpoint})
-	if err != nil {
-		panic(err)
-	}
-
-	controller.CasdoorController = casdoorController
-	authenticationInterceptor, err := authentication.NewGCPAuthenticationInterceptor(&authentication.GCPAuthenticationInterceptorConfiguration{
-		XTokenHeader:      c.componentConfig.GetTokenKey(),
-		CasdoorController: casdoorController,
-	})
-	if err != nil {
-		panic(err)
-	}
-
 	controller.vClusterController = vcluster.NewVClusterController(&controller)
-
-	controller.Interceptors = interceptors.NewInterceptor()
-	controller.Interceptors.SetAuthenticationInterceptor(authenticationInterceptor)
 
 	controller.vclusterServer = services.NewVClusterServer(&controller)
 
@@ -168,18 +134,8 @@ func (c *Controller) Serve(stopCh <-chan struct{}) {
 }
 
 func (c *Controller) startServerWithGracefulShutdown(stopCh <-chan struct{}) {
-	interceptorsList := c.Interceptors.InterceptorsList()
-
-	// 检查interceptorsList的长度，确保至少有三个元素
-	if len(interceptorsList) >= 3 {
-		// 删除第三个元素
-		interceptorsList = append(interceptorsList[:2], interceptorsList[3:]...)
-	}
-
-	interceptors := connect.WithInterceptors(interceptorsList...)
-
 	mux := http.NewServeMux()
-	svcPath, handler := vclusterv1connect.NewVClusterGatewayServiceHandler(c.vclusterServer, interceptors)
+	svcPath, handler := vclusterv1connect.NewVClusterGatewayServiceHandler(c.vclusterServer)
 	mux.Handle(svcPath, handler)
 
 	srv := &http.Server{
@@ -206,10 +162,6 @@ func (c *Controller) startServerWithGracefulShutdown(stopCh <-chan struct{}) {
 	}
 
 	gwmux := runtime.NewServeMux(
-		c.Interceptors.SetTokenHeader(),
-		c.Interceptors.SetGWApiKeyHeader(),
-		c.Interceptors.SetHttpConfigs(),
-		c.Interceptors.HandleGRPCError(),
 		runtime.WithMetadata(func(ctx context.Context, r *http.Request) metadata.MD {
 			md := metadata.MD{}
 

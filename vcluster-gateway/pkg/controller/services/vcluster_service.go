@@ -4,6 +4,8 @@ import (
 	"context"
 	"os"
 
+	log "github.com/sirupsen/logrus"
+
 	"connectrpc.com/connect"
 
 	v1 "gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/apis/config/vcluster_gateway/v1"
@@ -57,8 +59,8 @@ func (vcs *VClusterServer) VersionInformation(ctx context.Context, req *connect.
 // HTTP:
 // POST /v1/app
 func (vcs *VClusterServer) CreateVCluster(ctx context.Context, req *connect.Request[vclusterv1.CreateVClusterRequest]) (*connect.Response[vclusterv1.CreateVClusterResponse], error) {
-	username, tenantId, tenantType := vcs.controller.GetUsername(ctx), vcs.controller.GetUser(ctx).Properties[v1.UserTenantId], vcs.controller.GetUser(ctx).Properties[v1.UserTenantType]
-	gcpLogger := vcs.controller.GetLogger(ctx).WithField("username", username).WithField("tenantId", tenantId).WithField("tenantType", tenantType)
+	username, tenantId := "", ""
+	gcpLogger := log.New()
 
 	formatInstanceSpecs := func(before []*vclusterv1.CreateVClusterRequest_Orderlist_InstanceSpec) (after []*v1.InstanceSpec) {
 		after = make([]*v1.InstanceSpec, 0, len(before))
@@ -131,9 +133,8 @@ func (vcs *VClusterServer) CreateVCluster(ctx context.Context, req *connect.Requ
 // HTTP:
 // PUT /v1/app/{app_id}
 func (vcs *VClusterServer) UpdateVCluster(ctx context.Context, req *connect.Request[vclusterv1.UpdateVClusterRequest]) (*connect.Response[vclusterv1.UpdateVClusterResponse], error) {
-	username, tenantId, tenantType := vcs.controller.GetUsername(ctx), vcs.controller.GetUser(ctx).Properties[v1.UserTenantId], vcs.controller.GetUser(ctx).Properties[v1.UserTenantType]
-	gcpLogger := vcs.controller.GetLogger(ctx).WithField("username", username).WithField("tenantId", tenantId).WithField("tenantType", tenantType)
-
+	username, tenantId := "", ""
+	gcpLogger := log.New()
 	appId := req.Msg.AppId
 
 	formatInstanceSpecs := func(before []*vclusterv1.UpdateVClusterRequest_Orderlist_InstanceSpec) (after []*v1.InstanceSpec) {
@@ -210,18 +211,17 @@ func (vcs *VClusterServer) UpdateVCluster(ctx context.Context, req *connect.Requ
 // HTTP:
 // DELETE /v1/app/{app_id}
 func (vcs *VClusterServer) DeleteVCluster(ctx context.Context, req *connect.Request[vclusterv1.DeleteVClusterRequest]) (*connect.Response[vclusterv1.DeleteVClusterResponse], error) {
-	user, username := vcs.controller.GetUser(ctx), vcs.controller.GetUsername(ctx)
-	tenantId, tenantType := user.Properties[v1.UserTenantId], user.Properties[v1.UserTenantType]
+	username, tenantId := "", ""
+	gcpLogger := log.New()
 
 	appId := req.Msg.AppId
-	gcpLogger := vcs.controller.GetLogger(ctx).WithField("username", username).WithField("tenantId", tenantId).WithField("tenantType", tenantType).WithField("appId", appId)
 	resp, _ := vcs.controller.VClusterController().
 		DeleteVCluster(&v1.DeleteVClusterParams{
 			Logger:     gcpLogger,
 			Id:         appId,
 			Username:   username,
 			TenantId:   tenantId,
-			TenantType: tenantType,
+			TenantType: "",
 		})
 
 	return connect.NewResponse(resp), nil
@@ -231,12 +231,10 @@ func (vcs *VClusterServer) DeleteVCluster(ctx context.Context, req *connect.Requ
 // HTTP:
 // GET /v1/kubeconfig/{app_id}
 func (vcs *VClusterServer) GetKubeConfig(ctx context.Context, req *connect.Request[vclusterv1.GetKubeConfigRequest]) (*connect.Response[vclusterv1.GetKubeConfigResponse], error) {
-	username := vcs.controller.GetUsername(ctx)
-	tenantId, tenantType := vcs.controller.GetUser(ctx).Properties[v1.UserTenantId], vcs.controller.GetUser(ctx).Properties[v1.UserTenantType]
+	username, tenantId := "", ""
+	gcpLogger := log.New()
 
 	appId := req.Msg.AppId
-
-	gcpLogger := vcs.controller.GetLogger(ctx).WithField("username", username).WithField("tenantId", tenantId).WithField("tenantType", tenantType).WithField("appId", appId)
 
 	resp, _ := vcs.controller.VClusterController().
 		GetKubeConfig(&v1.GetKubeConfigParams{
@@ -244,7 +242,7 @@ func (vcs *VClusterServer) GetKubeConfig(ctx context.Context, req *connect.Reque
 			VClusterId: appId,
 			Username:   username,
 			TenantId:   tenantId,
-			TenantType: tenantType,
+			TenantType: "",
 		})
 
 	return connect.NewResponse(resp), nil
@@ -254,12 +252,10 @@ func (vcs *VClusterServer) GetKubeConfig(ctx context.Context, req *connect.Reque
 // HTTP:
 // GET /v1/kubeconfig/base64/{app_id}
 func (vcs *VClusterServer) GetKubeConfigBase64(ctx context.Context, req *connect.Request[vclusterv1.GetKubeConfigRequest]) (*connect.Response[vclusterv1.GetKubeConfigBase64Response], error) {
-	username := vcs.controller.GetUsername(ctx)
-	tenantId, tenantType := vcs.controller.GetUser(ctx).Properties[v1.UserTenantId], vcs.controller.GetUser(ctx).Properties[v1.UserTenantType]
+	username, tenantId := "", ""
+	gcpLogger := log.New()
 
 	appId := req.Msg.AppId
-
-	gcpLogger := vcs.controller.GetLogger(ctx).WithField("username", username).WithField("tenantId", tenantId).WithField("tenantType", tenantType).WithField("appId", appId)
 
 	resp, _ := vcs.controller.VClusterController().
 		GetKubeConfigBase64(&v1.GetKubeConfigParams{
@@ -267,7 +263,7 @@ func (vcs *VClusterServer) GetKubeConfigBase64(ctx context.Context, req *connect
 			VClusterId: appId,
 			Username:   username,
 			TenantId:   tenantId,
-			TenantType: tenantType,
+			TenantType: "",
 		})
 
 	return connect.NewResponse(resp), nil
@@ -277,12 +273,9 @@ func (vcs *VClusterServer) GetKubeConfigBase64(ctx context.Context, req *connect
 // HTTP:
 // POST /v1/app/{app_id}/pause
 func (vcs *VClusterServer) PauseVCluster(ctx context.Context, req *connect.Request[vclusterv1.PauseVClusterRequest]) (*connect.Response[vclusterv1.PauseVClusterResponse], error) {
-	username, user := vcs.controller.GetUsername(ctx), vcs.controller.GetUser(ctx)
-	tenantId, tenantType := user.Properties[v1.UserTenantId], user.Properties[v1.UserTenantType]
-
+	username, tenantId := "", ""
+	gcpLogger := log.New()
 	appId := req.Msg.AppId
-
-	gcpLogger := vcs.controller.GetLogger(ctx).WithField("username", username).WithField("tenantId", tenantId).WithField("tenantType", tenantType).WithField("appId", appId)
 
 	resp, _ := vcs.controller.VClusterController().
 		PauseVCluster(&v1.PauseVClusterParams{
@@ -290,7 +283,7 @@ func (vcs *VClusterServer) PauseVCluster(ctx context.Context, req *connect.Reque
 			Username:   username,
 			Id:         appId,
 			TenantId:   tenantId,
-			TenantType: tenantType,
+			TenantType: "",
 		})
 
 	return connect.NewResponse(resp), nil
@@ -300,12 +293,10 @@ func (vcs *VClusterServer) PauseVCluster(ctx context.Context, req *connect.Reque
 // HTTP:
 // POST /v1/app/{app_id}/recover
 func (vcs *VClusterServer) ResumeVCluster(ctx context.Context, req *connect.Request[vclusterv1.ResumeVClusterRequest]) (*connect.Response[vclusterv1.ResumeVClusterResponse], error) {
-	username, user := vcs.controller.GetUsername(ctx), vcs.controller.GetUser(ctx)
-	tenantId, tenantType := user.Properties[v1.UserTenantId], user.Properties[v1.UserTenantType]
+	username, tenantId := "", ""
+	gcpLogger := log.New()
 
 	appId := req.Msg.AppId
-
-	gcpLogger := vcs.controller.GetLogger(ctx).WithField("username", username).WithField("tenantId", tenantId).WithField("tenantType", tenantType).WithField("appId", appId)
 
 	resp, _ := vcs.controller.VClusterController().
 		ResumeVCluster(&v1.ResumeVClusterParams{
@@ -313,7 +304,7 @@ func (vcs *VClusterServer) ResumeVCluster(ctx context.Context, req *connect.Requ
 			Username:   username,
 			Id:         appId,
 			TenantId:   tenantId,
-			TenantType: tenantType,
+			TenantType: "",
 		})
 
 	return connect.NewResponse(resp), nil
@@ -324,24 +315,17 @@ func (vcs *VClusterServer) ResumeVCluster(ctx context.Context, req *connect.Requ
 // GET /v1/app/{app_id}?type={create|update|delete|stop|recover}
 // NOTE: app-gateway 通过该接口查询状态
 func (vcs *VClusterServer) QueryOperateStatus(ctx context.Context, req *connect.Request[vclusterv1.QueryOperateStatusRequest]) (*connect.Response[vclusterv1.QueryOperateStatusResponse], error) {
-	username, user := vcs.controller.GetUsername(ctx), vcs.controller.GetUser(ctx)
-	tenantId, tenantType := user.Properties[v1.UserTenantId], user.Properties[v1.UserTenantType]
+	username, tenantId := "", ""
+	gcpLogger := log.New()
 
 	appId, operateType := req.Msg.AppId, req.Msg.Action
-
-	gcpLogger := vcs.controller.GetLogger(ctx).
-		WithField("username", username).
-		WithField("tenantId", tenantId).
-		WithField("tenantType", tenantType).
-		WithField("appId", appId).
-		WithField("operateType", operateType)
 
 	resp, _ := vcs.controller.VClusterController().
 		QueryOperateStatus(&v1.QueryOperateStatusRequest{
 			Logger:     gcpLogger,
 			Username:   username,
 			TenantId:   tenantId,
-			TenantType: tenantType,
+			TenantType: "",
 
 			AppId:  appId,
 			Action: operateType,
@@ -354,23 +338,17 @@ func (vcs *VClusterServer) QueryOperateStatus(ctx context.Context, req *connect.
 // HTTP:
 // GET /v1/app/{app_id}/status
 func (vcs *VClusterServer) GetVClusterStatus(ctx context.Context, req *connect.Request[vclusterv1.GetVClusterStatusRequest]) (*connect.Response[vclusterv1.GetVClusterStatusResponse], error) {
-	username, user := vcs.controller.GetUsername(ctx), vcs.controller.GetUser(ctx)
-	tenantId, tenantType := user.Properties[v1.UserTenantId], user.Properties[v1.UserTenantType]
+	username, tenantId := "", ""
+	gcpLogger := log.New()
 
 	appId := req.Msg.AppId
-
-	gcpLogger := vcs.controller.GetLogger(ctx).
-		WithField("username", username).
-		WithField("tenantId", tenantId).
-		WithField("tenantType", tenantType).
-		WithField("appId", appId)
 
 	resp, _ := vcs.controller.VClusterController().
 		GetVClusterStatus(&v1.GetVClusterStatusRequest{
 			Logger:     gcpLogger,
 			Username:   username,
 			TenantId:   tenantId,
-			TenantType: tenantType,
+			TenantType: "",
 
 			AppId: appId,
 		})
@@ -382,23 +360,17 @@ func (vcs *VClusterServer) GetVClusterStatus(ctx context.Context, req *connect.R
 // HTTP:
 // GET /v1/app/{app_id}/resourcedetails
 func (vcs *VClusterServer) GetVClusterResourceDetails(ctx context.Context, req *connect.Request[vclusterv1.GetVClusterResourceDetailsRequest]) (*connect.Response[vclusterv1.GetVClusterResourceDetailsResponse], error) {
-	username, user := vcs.controller.GetUsername(ctx), vcs.controller.GetUser(ctx)
-	tenantId, tenantType := user.Properties[v1.UserTenantId], user.Properties[v1.UserTenantType]
+	username, tenantId := "", ""
+	gcpLogger := log.New()
 
 	appId := req.Msg.AppId
-
-	gcpLogger := vcs.controller.GetLogger(ctx).
-		WithField("username", username).
-		WithField("tenantId", tenantId).
-		WithField("tenantType", tenantType).
-		WithField("appId", appId)
 
 	resp, _ := vcs.controller.VClusterController().
 		GetVClusterResourceDetails(&v1.GetVClusterResourceDetailsRequest{
 			Logger:     gcpLogger,
 			Username:   username,
 			TenantId:   tenantId,
-			TenantType: tenantType,
+			TenantType: "",
 
 			AppId: appId,
 		})
@@ -410,21 +382,15 @@ func (vcs *VClusterServer) GetVClusterResourceDetails(ctx context.Context, req *
 // HTTP:
 // GET /v1/vclusters/{vcluster_id}/namespaces/{namespace}/pods/{pod_name}/containers/{container_name}/id
 func (vcs *VClusterServer) GetVClusterContainerID(ctx context.Context, req *connect.Request[vclusterv1.GetVClusterContainerIDRequest]) (*connect.Response[vclusterv1.GetVClusterContainerIDResponse], error) {
-	username, user := vcs.controller.GetUsername(ctx), vcs.controller.GetUser(ctx)
-	tenantId, tenantType := user.Properties[v1.UserTenantId], user.Properties[v1.UserTenantType]
-
-	gcpLogger := vcs.controller.GetLogger(ctx).
-		WithField("username", username).
-		WithField("tenantId", tenantId).
-		WithField("tenantType", tenantType).
-		WithField("vclusterId", req.Msg.VclusterId)
+	username, tenantId := "", ""
+	gcpLogger := log.New()
 
 	resp, _ := vcs.controller.VClusterController().
 		GetVClusterContainerID(&v1.GetVClusterContainerIDRequest{
 			Logger:        gcpLogger,
 			Username:      username,
 			TenantId:      tenantId,
-			TenantType:    tenantType,
+			TenantType:    "",
 			VClusterId:    req.Msg.VclusterId,
 			Namespace:     req.Msg.Namespace,
 			PodName:       req.Msg.PodName,

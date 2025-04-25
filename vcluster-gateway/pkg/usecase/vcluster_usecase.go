@@ -8,13 +8,11 @@ import (
 
 	"github.com/dgraph-io/ristretto"
 
-	"github.com/loft-sh/log"
 	"github.com/pkg/errors"
 
-	logger "gitlab.datacanvas.com/AlayaNeW/OSM/gokit/log"
+	log "github.com/sirupsen/logrus"
 	v1 "gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/apis/config/vcluster_gateway/v1"
 	vclusterv1 "gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/apis/grpc/gen/datacanvas/gcp/osm/vcluster_1.1/v1"
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/controller/vcluster_gateway"
 	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/datasource"
 	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/internal/utils"
 	forkvcluster "gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/internal/vcluster"
@@ -116,7 +114,7 @@ func (vcuc *VClusterUseCase) CreateVCluster(ctx context.Context, info *v1.VClust
 		return resp, errors.Wrapf(v1.ErrorVClusterNameAlreadyExists, "failed to CreateVCluster, vcluster name: %s is already in process", info.Name)
 	}
 
-	ctx = context.WithValue(context.Background(), "logger", info.Logger)
+	ctx = context.Background()
 	info.Id, err = vcuc.Repo.GenerateUniqueVClusterId(ctx)
 	if err != nil {
 		return resp, errors.Wrapf(err, "failed to generate vcluster id")
@@ -138,7 +136,7 @@ func (vcuc *VClusterUseCase) CreateVCluster(ctx context.Context, info *v1.VClust
 					vc.ServerStatus = consts.VClusterStatusFailed
 					vc.Reason = errInGoRoutine.Error()
 					if err := vcuc.Repo.UpdateVCluster(vc); err != nil {
-						info.Logger.Errorf("failed to update vcluster status to failed, err: %v", err)
+						log.Errorf("failed to update vcluster status to failed, err: %v", err)
 					}
 				}
 			}
@@ -147,7 +145,7 @@ func (vcuc *VClusterUseCase) CreateVCluster(ctx context.Context, info *v1.VClust
 		// 真正创建集群
 		resp.VClusterId, errInGoRoutine = vcuc.createOrUpgrade(ctx, info)
 		if errInGoRoutine != nil {
-			info.Logger.Errorf("failed to createOrUpgrade vcluster, err: %v", err)
+			log.Errorf("failed to createOrUpgrade vcluster, err: %v", err)
 			return
 		}
 	}()
@@ -193,7 +191,7 @@ func (vcuc *VClusterUseCase) UpdateVCluster(ctx context.Context, info *v1.VClust
 				vCluster.Status = consts.VClusterStatusFailed
 				vCluster.Reason = errInGoRoutine.Error()
 				if err = vcuc.Repo.UpdateVCluster(vCluster); err != nil {
-					info.Logger.Errorf("failed to update vcluster db record: %v", err)
+					log.Errorf("failed to update vcluster db record: %v", err)
 				}
 			}
 		}()
@@ -201,7 +199,7 @@ func (vcuc *VClusterUseCase) UpdateVCluster(ctx context.Context, info *v1.VClust
 		// 更新集群
 		_, errInGoRoutine = vcuc.createOrUpgrade(ctx, info)
 		if errInGoRoutine != nil {
-			info.Logger.Errorf("failed to createOrUpgrade vcluster: %v", err)
+			log.Errorf("failed to createOrUpgrade vcluster: %v", err)
 			return
 		}
 	}()
@@ -214,7 +212,7 @@ func (vcuc *VClusterUseCase) createOrUpgrade(ctx context.Context, info *v1.VClus
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
 
-	vclusterLogger := info.Logger.WithField("vclusterId", info.Id)
+	vclusterLogger := log.New()
 
 	// 创建一个用于处理 helm values.yaml 值的 processor
 	process := processor.NewHelmValuesProcessor()
@@ -250,7 +248,6 @@ func (vcuc *VClusterUseCase) createOrUpgrade(ctx context.Context, info *v1.VClus
 
 	createHelm := forkvcluster.NewCreateHelm(
 		forkvcluster.WithGlobalFlags(globalFlags),
-		forkvcluster.WithLogger(vcluster_gateway.NewVClusterLogger(vclusterLogger)),
 		forkvcluster.WithCreateOptions(forkvcluster.NewDefaultCreateOptions()),
 		forkvcluster.WithCreateChartRepo(info.ChartRepo),
 		forkvcluster.WithCreateK8sConfig(rootK8sConfig),
@@ -464,8 +461,7 @@ func (vcuc *VClusterUseCase) delete(ctx context.Context, params *v1.DeleteVClust
 
 	deleteHelm := forkvcluster.NewDeleteHelm(
 		forkvcluster.WithDeleteGlobalFlags(globalFlags),
-		forkvcluster.WithDeleteLogger(log.GetInstance()),
-		forkvcluster.WithDeleteLogger(vcluster_gateway.NewVClusterLogger(params.Logger)),
+		// forkvcluster.WithDeleteLogger(log.New()),
 		forkvcluster.WithDeleteK8sConfig(rootK8sConfig),
 		forkvcluster.WithDeleteOptions(forkvcluster.NewDefaultDeleteOptions()),
 	)
@@ -559,7 +555,7 @@ func (vcuc *VClusterUseCase) PauseVClusters(ctx context.Context, params *v1.Paus
 			}
 		}()
 
-		ctx = context.WithValue(ctx, "logger", params.Logger)
+		ctx = context.Background()
 		rootK8sConfig, errInGoRoutine := vcuc.Repo.GetRootK8sConfig()
 		if errInGoRoutine != nil {
 			params.Logger.Errorf("failed to get root k8s config, err: %v, vclusterId: %s", err, id)
@@ -579,8 +575,6 @@ func (vcuc *VClusterUseCase) PauseVClusters(ctx context.Context, params *v1.Paus
 }
 
 func (vcuc *VClusterUseCase) pause(ctx context.Context, vClusterId string, rootK8sConfig *v1.RootK8sConfig) error {
-	gcpLogger := ctx.Value("logger").(*logger.Logger)
-
 	exist := vcuc.Repo.CheckVClusterExistById(vClusterId)
 	if !exist {
 		return errors.Errorf("vcluster %s not exist", vClusterId)
@@ -590,7 +584,7 @@ func (vcuc *VClusterUseCase) pause(ctx context.Context, vClusterId string, rootK
 		rootK8sConfig.RootKubeClientSet,
 		vClusterId,
 		utils.GetVClusterNamespaceName(vClusterId),
-		vcluster_gateway.NewVClusterLogger(gcpLogger),
+		nil,
 	)
 	if err != nil {
 		return errors.Wrapf(err, "vcluster: %s pause failed", vClusterId)
@@ -690,8 +684,6 @@ func (vcuc *VClusterUseCase) ResumeVClusters(ctx context.Context, params *v1.Pau
 }
 
 func (vcuc *VClusterUseCase) resume(ctx context.Context, vClusterId string, rootK8sConfig *v1.RootK8sConfig) error {
-	gcpLogger := ctx.Value("logger").(*logger.Logger)
-
 	exist := vcuc.Repo.CheckVClusterExistById(vClusterId)
 	if !exist {
 		return errors.Errorf("vcluster %s not exist", vClusterId)
@@ -701,7 +693,8 @@ func (vcuc *VClusterUseCase) resume(ctx context.Context, vClusterId string, root
 		rootK8sConfig.RootKubeClientSet,
 		vClusterId,
 		utils.GetVClusterNamespaceName(vClusterId),
-		vcluster_gateway.NewVClusterLogger(gcpLogger))
+		nil,
+	)
 	if err != nil {
 		return errors.Wrapf(err, "vcluster: %s resume failed", vClusterId)
 	}

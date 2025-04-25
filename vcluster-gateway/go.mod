@@ -264,6 +264,5 @@ require (
 
 replace (
 	github.com/google/cel-go => github.com/google/cel-go v0.16.0
-	gitlab.datacanvas.com/AlayaNeW/OSM/gokit => gitlab.datacanvas.com/AlayaNeW/OSM/gokit.git v0.1.6
 	k8s.io/kube-openapi => k8s.io/kube-openapi v0.0.0-20230717233707-2695361300d9
 )

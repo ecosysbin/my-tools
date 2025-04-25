@@ -6,7 +6,7 @@ import (
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
 
-	"gitlab.datacanvas.com/AlayaNeW/OSM/gokit/log"
+	log "github.com/sirupsen/logrus"
 
 	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/internal/model"
 )

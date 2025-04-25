@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
+
+	kerrors "k8s.io/apimachinery/pkg/api/errors"
 
 	"github.com/pkg/errors"
 
@@ -24,7 +25,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/clientcmd/api"
 
-	"gitlab.datacanvas.com/AlayaNeW/OSM/gokit/log"
+	log "github.com/sirupsen/logrus"
 	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/internal/model"
 	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/internal/utils"
 	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/internal/vcluster/find"
@@ -59,8 +60,7 @@ type KubernetesDataSource struct {
 }
 
 func NewKubernetesDataSource(db VClusterDBDataSource) (VClusterKubernetesDataSource, error) {
-	logger := log.WithField("layer", "kubernetes_datasource")
-
+	logger := log.New()
 	// 使用 ServiceAccount 的 token 生成 kubeconfig 文件
 	if err := generateKubeconfig(); err != nil {
 		return nil, errors.Errorf("error generating kubeconfig: %w", err)

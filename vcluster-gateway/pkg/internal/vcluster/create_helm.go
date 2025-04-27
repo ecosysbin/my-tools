@@ -40,8 +40,8 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 
-	v1 "gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/apis/config/vcluster_gateway/v1"
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/internal/utils"
+	v1 "vcluster-gateway/pkg/apis/config/vcluster_gateway/v1"
+	"vcluster-gateway/pkg/internal/utils"
 )
 
 var allowedDistros = []string{"k3s", "k0s", "k8s", "eks"}

@@ -14,7 +14,7 @@
 // limitations under the License.
 //
 
-module gitlab.datacanvas.com/aidc/vcluster-gateway
+module vcluster-gateway
 
 go 1.22.1
 

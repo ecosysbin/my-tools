@@ -12,10 +12,10 @@ import (
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 
-	v1 "gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/apis/config/vcluster_gateway/v1"
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/usecase/consts"
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/usecase/models"
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/usecase/utils"
+	v1 "vcluster-gateway/pkg/apis/config/vcluster_gateway/v1"
+	"vcluster-gateway/pkg/usecase/consts"
+	"vcluster-gateway/pkg/usecase/models"
+	"vcluster-gateway/pkg/usecase/utils"
 )
 
 // PreprocessFunc 预处理 VClusterInfo 的函数类型

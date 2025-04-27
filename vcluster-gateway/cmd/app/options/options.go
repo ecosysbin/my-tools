@@ -20,8 +20,8 @@ import (
 	"github.com/endverse/go-kit/aggregate"
 	cliflag "k8s.io/component-base/cli/flag"
 
-	appconfig "gitlab.datacanvas.com/aidc/vcluster-gateway/cmd/app/config"
-	configv1 "gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/apis/config/vcluster_gateway/v1"
+	appconfig "vcluster-gateway/cmd/app/config"
+	configv1 "vcluster-gateway/pkg/apis/config/vcluster_gateway/v1"
 )
 
 type Options struct {

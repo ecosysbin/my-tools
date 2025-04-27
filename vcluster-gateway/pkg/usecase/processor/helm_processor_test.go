@@ -7,10 +7,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	v1 "gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/apis/config/vcluster_gateway/v1"
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/usecase/consts"
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/usecase/models"
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/usecase/processor"
+	v1 "vcluster-gateway/pkg/apis/config/vcluster_gateway/v1"
+	"vcluster-gateway/pkg/usecase/consts"
+	"vcluster-gateway/pkg/usecase/models"
+	"vcluster-gateway/pkg/usecase/processor"
 )
 
 func mockVClusterInfo() *v1.VClusterInfo {

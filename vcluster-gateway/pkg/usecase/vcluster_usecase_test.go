@@ -7,8 +7,8 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	v1 "gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/apis/config/vcluster_gateway/v1"
-	processor "gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/usecase/processor"
+	v1 "vcluster-gateway/pkg/apis/config/vcluster_gateway/v1"
+	processor "vcluster-gateway/pkg/usecase/processor"
 )
 
 func TestProcessVClusterInfo(t *testing.T) {

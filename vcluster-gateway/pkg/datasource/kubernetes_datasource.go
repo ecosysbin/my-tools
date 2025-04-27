@@ -25,10 +25,11 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/clientcmd/api"
 
+	"vcluster-gateway/pkg/internal/model"
+	"vcluster-gateway/pkg/internal/utils"
+	"vcluster-gateway/pkg/internal/vcluster/find"
+
 	log "github.com/sirupsen/logrus"
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/internal/model"
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/internal/utils"
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/internal/vcluster/find"
 )
 
 type ClusterName = string

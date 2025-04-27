@@ -6,7 +6,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/clientcmd/api"
 
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/internal/model"
+	"vcluster-gateway/pkg/internal/model"
 )
 
 // VClusterDBDataSource define DB DataSource Functions

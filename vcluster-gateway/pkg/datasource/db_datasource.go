@@ -8,7 +8,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/internal/model"
+	"vcluster-gateway/pkg/internal/model"
 )
 
 var _ VClusterDBDataSource = &DBDataSource{}

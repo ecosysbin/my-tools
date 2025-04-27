@@ -10,16 +10,17 @@ import (
 
 	"github.com/pkg/errors"
 
+	v1 "vcluster-gateway/pkg/apis/config/vcluster_gateway/v1"
+	vclusterv1 "vcluster-gateway/pkg/apis/grpc/gen/datacanvas/gcp/osm/vcluster_1.1/v1"
+	"vcluster-gateway/pkg/datasource"
+	"vcluster-gateway/pkg/internal/utils"
+	forkvcluster "vcluster-gateway/pkg/internal/vcluster"
+	"vcluster-gateway/pkg/internal/vcluster/lifecycle"
+	"vcluster-gateway/pkg/repository"
+	"vcluster-gateway/pkg/usecase/consts"
+	"vcluster-gateway/pkg/usecase/processor"
+
 	log "github.com/sirupsen/logrus"
-	v1 "gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/apis/config/vcluster_gateway/v1"
-	vclusterv1 "gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/apis/grpc/gen/datacanvas/gcp/osm/vcluster_1.1/v1"
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/datasource"
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/internal/utils"
-	forkvcluster "gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/internal/vcluster"
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/internal/vcluster/lifecycle"
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/repository"
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/usecase/consts"
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/usecase/processor"
 )
 
 type cachePrefix string

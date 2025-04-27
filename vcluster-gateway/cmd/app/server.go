@@ -25,10 +25,10 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/cmd/app/config"
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/cmd/app/options"
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/controller"
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/version"
+	"vcluster-gateway/cmd/app/config"
+	"vcluster-gateway/cmd/app/options"
+	"vcluster-gateway/pkg/controller"
+	"vcluster-gateway/version"
 )
 
 func NewVclusterGatewayCommand() *cobra.Command {
@@ -38,8 +38,6 @@ func NewVclusterGatewayCommand() *cobra.Command {
 
 	cmd.AddCommand(newVclusterGatewayCommand())
 	cmd.AddCommand(version.NewVersionCommand())
-
-	// log.AddFlags(cmd.PersistentFlags(), cmd.Name())
 
 	return cmd
 }
@@ -54,9 +52,6 @@ func newVclusterGatewayCommand() *cobra.Command {
 		Use:   "start",
 		Short: "Run GCP VclusterGateway Gateway Server.",
 		Run: func(cmd *cobra.Command, args []string) {
-			// logger := log.InitLogger()
-			// defer logger.Sync()
-
 			// set up signals, so we handle the first shutdown signal gracefully
 			stopCh := signals.SetupSignalHandler()
 

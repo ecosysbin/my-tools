@@ -24,13 +24,14 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/clientcmd/api"
 
+	v1 "vcluster-gateway/pkg/apis/config/vcluster_gateway/v1"
+	vclusterv1 "vcluster-gateway/pkg/apis/grpc/gen/datacanvas/gcp/osm/vcluster_1.1/v1"
+	"vcluster-gateway/pkg/datasource"
+	"vcluster-gateway/pkg/internal/model"
+	"vcluster-gateway/pkg/internal/utils"
+	"vcluster-gateway/pkg/usecase/consts"
+
 	log "github.com/sirupsen/logrus"
-	v1 "gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/apis/config/vcluster_gateway/v1"
-	vclusterv1 "gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/apis/grpc/gen/datacanvas/gcp/osm/vcluster_1.1/v1"
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/datasource"
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/internal/model"
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/internal/utils"
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/usecase/consts"
 )
 
 var _ VClusterRepository = &VClusterRepositoryImpl{}

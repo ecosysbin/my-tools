@@ -17,7 +17,7 @@
 package config
 
 import (
-	configv1 "gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/apis/config/vcluster_gateway/v1"
+	configv1 "vcluster-gateway/pkg/apis/config/vcluster_gateway/v1"
 )
 
 type Config struct {

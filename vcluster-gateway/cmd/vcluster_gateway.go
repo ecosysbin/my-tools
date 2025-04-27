@@ -22,10 +22,10 @@ import (
 	"github.com/spf13/pflag"
 	cliflag "k8s.io/component-base/cli/flag"
 
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/cmd/app"
+	"vcluster-gateway/cmd/app"
 )
 
-//	@title			GCP VclusterGateway Gateway API
+//	@title			VclusterGateway Gateway API
 //	@version		1.0
 //	@description	This is an authorization authentication proxy service.
 

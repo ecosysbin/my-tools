@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/internal/utils"
+	"vcluster-gateway/pkg/internal/utils"
 
 	"github.com/loft-sh/log"
 	"github.com/loft-sh/vcluster/cmd/vclusterctl/cmd/app/localkubernetes"
@@ -20,8 +20,8 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 
-	v1 "gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/apis/config/vcluster_gateway/v1"
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/internal/vcluster/find"
+	v1 "vcluster-gateway/pkg/apis/config/vcluster_gateway/v1"
+	"vcluster-gateway/pkg/internal/vcluster/find"
 )
 
 // DeleteHelmOption 使用 Option模式创建 CreateHelm

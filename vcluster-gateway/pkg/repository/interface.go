@@ -6,9 +6,9 @@ import (
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 
-	v1 "gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/apis/config/vcluster_gateway/v1"
-	vclusterv1 "gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/apis/grpc/gen/datacanvas/gcp/osm/vcluster_1.1/v1"
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/internal/model"
+	v1 "vcluster-gateway/pkg/apis/config/vcluster_gateway/v1"
+	vclusterv1 "vcluster-gateway/pkg/apis/grpc/gen/datacanvas/gcp/osm/vcluster_1.1/v1"
+	"vcluster-gateway/pkg/internal/model"
 )
 
 type VClusterRepository interface {

@@ -4,10 +4,10 @@ import (
 	"go.uber.org/dig"
 	"gorm.io/gorm"
 
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/controller/framework"
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/datasource"
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/repository"
-	"gitlab.datacanvas.com/aidc/vcluster-gateway/pkg/usecase"
+	"vcluster-gateway/pkg/controller/framework"
+	"vcluster-gateway/pkg/datasource"
+	"vcluster-gateway/pkg/repository"
+	"vcluster-gateway/pkg/usecase"
 )
 
 var globalDIContainer *DIContainer

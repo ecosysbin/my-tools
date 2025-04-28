@@ -19,7 +19,6 @@ package options
 import (
 	"context"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/allegro/bigcache/v3"
@@ -28,9 +27,6 @@ import (
 	"github.com/conductor-sdk/conductor-go/sdk/worker"
 	"github.com/conductor-sdk/conductor-go/sdk/workflow/executor"
 	"github.com/spf13/pflag"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/informers"
@@ -246,27 +242,27 @@ func (o *VclusterGatewayOptions) createBigCache() {
 }
 
 func (o *VclusterGatewayOptions) connectDb(dsn string) {
-	d, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
-		DisableForeignKeyConstraintWhenMigrating: true,
-		Logger:                                   logger.Default.LogMode(logger.Warn),
-		AllowGlobalUpdate:                        true,
-	},
-	)
-	if err != nil {
-		log.Error("open mysql failed,", err)
-		os.Exit(1)
-	}
+	// d, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+	// 	DisableForeignKeyConstraintWhenMigrating: true,
+	// 	Logger:                                   logger.Default.LogMode(logger.Warn),
+	// 	AllowGlobalUpdate:                        true,
+	// },
+	// )
+	// if err != nil {
+	// 	log.Error("open mysql failed,", err)
+	// 	os.Exit(1)
+	// }
 
-	o.AllCluster.DB = d
-	sqlDB, e := o.AllCluster.DB.DB()
-	if e != nil {
-		log.Error("sql.db  failed,", e)
-		os.Exit(1)
-	}
+	// o.AllCluster.DB = d
+	// sqlDB, e := o.AllCluster.DB.DB()
+	// if e != nil {
+	// 	log.Error("sql.db  failed,", e)
+	// 	os.Exit(1)
+	// }
 
-	sqlDB.SetMaxIdleConns(10)
-	sqlDB.SetMaxOpenConns(100)
-	sqlDB.SetConnMaxLifetime(time.Minute * 30)
+	// sqlDB.SetMaxIdleConns(10)
+	// sqlDB.SetMaxOpenConns(100)
+	// sqlDB.SetConnMaxLifetime(time.Minute * 30)
 }
 
 func (o *VclusterGatewayOptions) createVClusterToken() {

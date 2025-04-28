@@ -24,6 +24,7 @@ import (
 	"github.com/conductor-sdk/conductor-go/sdk/client"
 	"github.com/conductor-sdk/conductor-go/sdk/worker"
 	"github.com/conductor-sdk/conductor-go/sdk/workflow/executor"
+	"github.com/gin-gonic/gin"
 	"github.com/go-resty/resty/v2"
 	"go.uber.org/dig"
 	"gorm.io/gorm"
@@ -103,4 +104,8 @@ type ReverseProxyHandlerInterface interface{}
 
 type DIContainerInterface interface {
 	Invoke(function interface{}, opts ...dig.InvokeOption) error
+}
+
+type VClusterHandlerInterface interface {
+	ListProductProfiles(c *gin.Context)
 }

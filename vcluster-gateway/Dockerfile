@@ -16,14 +16,14 @@
 
 #FROM harbor.zetyun.cn/gcp/golang-alpine3.19-tini:1.22.1 as builder
 
-FROM harbor.zetyun.cn/gcp/golang-alpine3.19-tini:1.22.1 as builder
+FROM registry.cn-beijing.aliyuncs.com/mfimg/private:golang1.22 as builder
 
 WORKDIR /workspace
 
 ENV GOPROXY https://goproxy.cn,direct
 ARG GO_BUILD_ARGS
 
-RUN wget http://harbor.zetyun.cn:9000/aidc/helm && \
+RUN wget http://containercloud-mirror.xaidc.com:9000/containercloud/helm && \
     chmod +x helm && \
     mv helm /usr/local/bin/helm
 
@@ -44,7 +44,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "$GO_BUILD_ARGS" -o 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-FROM harbor.zetyun.cn/gcp/ubuntu-tini:22.04
+FROM FROM registry.cn-beijing.aliyuncs.com/mfimg/private:alpine3.16
 
 COPY --from=builder /workspace/vcluster-gateway .
 COPY --from=builder /workspace/hack ./hack

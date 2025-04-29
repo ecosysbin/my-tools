@@ -20,7 +20,7 @@ WORKDIR /workspace
 
 ENV GOPROXY  https://goproxy.cn,direct
 
-RUN wget http://harbor.zetyun.cn:9000/aidc/helm && \
+RUN wget http://containercloud-mirror.xaidc.com:9000/containercloud/helm && \
     chmod +x helm && \
     mv helm /usr/local/bin/helm
 

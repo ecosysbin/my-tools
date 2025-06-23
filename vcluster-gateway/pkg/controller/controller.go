@@ -76,11 +76,11 @@ func New(opts ...Option) *Controller {
 		Router: gin.Default(),
 	}
 
-	// controller.diContainer = dicontainer.NewDIContainer(&controller)
+	controller.diContainer = dicontainer.NewDIContainer(&controller)
 
-	// controller.vClusterController = vcluster.NewVClusterController(&controller)
+	controller.vClusterController = vcluster.NewVClusterController(&controller)
 
-	// controller.vclusterServer = services.NewVClusterServer(&controller)
+	controller.vclusterServer = services.NewVClusterServer(&controller)
 
 	// new
 	controller.vClusterHandler = handler.NewVClusterHandler(&controller)

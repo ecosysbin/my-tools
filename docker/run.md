@@ -28,3 +28,6 @@ docker exec -it b7941f7b4f94 /bin/bash
 ```
 docker buildx build -t "volcanosh/vc-controller-manager:79255a8dec66b3bb1a15d3e709240031a2ebffd8" . -f ./installer/dockerfile/controller-manager/Dockerfile --output=type="docker" --platform "linux/amd64" --build-arg APK_MIRROR= --build-arg OPEN_EULER_IMAGE_TAG=22.03-lts-sp2 --build-arg HTTP_PROXY=http://172.20.3.88:1088 --build-arg HTTPS_PROXY=http://172.20.3.88:1088;
 ```
+
+# 清理所有未使用的镜像
+docker image prune -a

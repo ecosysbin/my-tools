@@ -3,13 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
-	"os"
 
-	"greet/internal/config"
-	"greet/internal/handler"
-	"greet/internal/svc"
-
-	"github.com/rs/zerolog"
+	"go-zero/internal/config"
+	"go-zero/internal/handler"
+	"go-zero/internal/svc"
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/rest"
@@ -30,9 +27,5 @@ func main() {
 	handler.RegisterHandlers(server, ctx)
 
 	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
-
-	log := zerolog.New(os.Stderr)
-	log = log.With().Caller().Logger()
-	log.Info().Msg("hello world")
 	server.Start()
 }

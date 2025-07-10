@@ -1,6 +1,7 @@
 type (
 	Request {
-		Name string `path:"name,options=[you,me]"` // parameters are auto validated
+		Name        string `path:"name,options=[you,me]"` // parameters are auto validated
+		CreateTimes string `path:"time,options=[you,me]"`
 	}
 	Response {
 		Message string `json:"message"`
@@ -11,3 +12,4 @@ service greet-api {
 	@handler GreetHandler
 	get /greet/from/:name (Request) returns (Response)
 }
+

@@ -1,11 +1,8 @@
-module greet
+module go-zero
 
 go 1.24.0
 
-require (
-	github.com/rs/zerolog v1.34.0
-	github.com/zeromicro/go-zero v1.8.4
-)
+require github.com/zeromicro/go-zero v1.8.4
 
 require (
 	github.com/beorn7/perks v1.0.1 // indirect

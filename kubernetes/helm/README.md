@@ -24,3 +24,6 @@ helm pull kubeovn/kube-ovn
 
 # 查询已安装的helm软件包
 helm list --namespace kube-public
+
+# 升级版本
+helm upgrade vc-kubeflow vcluster/vcluster -n vc-kubeflow -f ./package/values.yaml

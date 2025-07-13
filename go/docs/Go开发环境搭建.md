@@ -38,3 +38,32 @@ source /etc/profile.d/go_env
 打开VSCode  ->  Ctrol + Shift + p  ->  Go: Install/Update Tools
 选择所有的go插件，点击ok，等待安装完成
   2）.在没外网的情况下将如下开发插件放入$GOPATH目录下解压，重启vscode
+
+## 4.vscode debugger
+1）. 左侧小昆虫->Launch Package->选择加载的项目->点击齿轮->生成本地launch配置
+2）. 配置信息如下：主要关注args
+```
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch Package",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${fileDirname}",
+            "args": [
+                "--api",
+                "./greet.api",
+                "--output",
+                "greet",
+                "--package",
+                "client"
+            ]
+        }
+    ]
+}
+```

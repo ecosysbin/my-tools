@@ -5,10 +5,11 @@ import (
 	"flag"
 	"fmt"
 	"go/format"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
+	"unicode"
 )
 
 // APIDefinition 表示整个.api文件的定义
@@ -62,7 +63,7 @@ func parseAPIDefinition(content string) (*APIDefinition, error) {
 
 	// 解析服务定义
 	fmt.Println("parse service code")
-	serviceRegex := regexp.MustCompile(`service\s+(\w+)\s*\{\s*([\s\S]*?)\s*\}`)
+	serviceRegex := regexp.MustCompile(`service\s+([\w-]+)\s*\{\s*([\s\S]*?)\s*\}`)
 	serviceMatches := serviceRegex.FindAllStringSubmatch(content, -1)
 
 	for _, match := range serviceMatches {
@@ -70,7 +71,8 @@ func parseAPIDefinition(content string) (*APIDefinition, error) {
 			continue
 		}
 
-		serviceName := match[1]
+		serviceName := convertToCamelCase(match[1])
+
 		serviceContent := match[2]
 
 		service := ServiceDefinition{
@@ -82,6 +84,30 @@ func parseAPIDefinition(content string) (*APIDefinition, error) {
 	}
 
 	return apiDef, nil
+}
+
+// ConvertToCamelCase 将中划线分隔的字符串转换为驼峰命名（首字母大写）
+func convertToCamelCase(s string) string {
+	if s == "" {
+		return ""
+	}
+
+	// 按中划线分割字符串
+	parts := strings.Split(s, "-")
+	var result strings.Builder
+
+	for _, part := range parts {
+		if len(part) == 0 {
+			continue
+		}
+
+		// 将每个部分的首字母大写，其余字符保持原样
+		runes := []rune(part)
+		runes[0] = unicode.ToUpper(runes[0])
+		result.WriteString(string(runes))
+	}
+
+	return result.String()
 }
 
 // 解析类型定义
@@ -177,13 +203,20 @@ func generateClientCode(apiDef *APIDefinition, packageName string) ([]byte, erro
 	// 导入必要的包
 	buf.WriteString(`import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
-	"strings"
 )
+
+`)
+
+	buf.WriteString(`// _forceBytesImport 强制导入 bytes 包，避免条件编译错误
+func _forceBytesImport() {
+	_ = bytes.Buffer{}
+}
 
 `)
 
@@ -227,93 +260,124 @@ func generateClientCode(apiDef *APIDefinition, packageName string) ([]byte, erro
 	buf.WriteString("}\n\n")
 
 	// 生成方法
-	fmt.Println("generate function code")
 	for _, service := range apiDef.Services {
 		for _, method := range service.Methods {
-			// 解析路径参数
-			pathParams := extractPathParams(method.Path)
+			// 1. 解析当前请求结构体的参数类型（path/form/header/json）
+			var (
+				requestType  *TypeDefinition
+				pathParams   []FieldDefinition // path:"name"
+				formParams   []FieldDefinition // form:"delete,optional"
+				headerParams []FieldDefinition // header:"authorization"
+				jsonParams   []FieldDefinition // json:"name"
+			)
 
-			// 生成方法签名
-			buf.WriteString(fmt.Sprintf("// %s 对应.api文件中的%s接口\n", method.Handler, method.Handler))
-			buf.WriteString(fmt.Sprintf("func (c *%sClient) %s(", apiDef.Services[0].Name, method.Handler))
-
-			// 添加请求参数
-			if method.Request != "" {
-				buf.WriteString(fmt.Sprintf("req %s", method.Request))
+			// 查找请求结构体定义
+			for _, typ := range apiDef.Types {
+				if typ.Name == method.Request {
+					requestType = &typ
+					break
+				}
 			}
 
-			buf.WriteString(fmt.Sprintf(") (*%s, error) {\n", method.Response))
-
-			// 构建URL
-			buf.WriteString("	url := fmt.Sprintf(\"%s%s\", c.domain, \"")
-
-			// 处理路径参数
-			pathTemplate := method.Path
-			for _, param := range pathParams {
-				paramName := strings.Trim(param, ":/")
-				pathTemplate = strings.Replace(pathTemplate, paramName, "%s", 1)
-			}
-
-			buf.WriteString(pathTemplate)
-
-			// 添加路径参数值
-			if len(pathParams) > 0 {
-				buf.WriteString("\",")
-				for i, param := range pathParams {
-					paramName := strings.Trim(param, ":/")
-					buf.WriteString(fmt.Sprintf("req.%s", paramName))
-					if i < len(pathParams)-1 {
-						buf.WriteString(", ")
+			// 分类参数
+			if requestType != nil {
+				for _, field := range requestType.Fields {
+					switch {
+					case strings.Contains(field.Tag, `path:"`):
+						pathParams = append(pathParams, field)
+					case strings.Contains(field.Tag, `form:"`):
+						formParams = append(formParams, field)
+					case strings.Contains(field.Tag, `header:"`):
+						headerParams = append(headerParams, field)
+					case strings.Contains(field.Tag, `json:"`):
+						jsonParams = append(jsonParams, field)
 					}
 				}
-			} else {
-				buf.WriteString("\")")
 			}
 
-			// 处理查询参数
-			if hasQueryParams(method.Path) {
-				buf.WriteString("\n\n	// 处理查询参数")
-				buf.WriteString("\n	query := url.Values{}")
+			// 2. 生成方法签名
+			buf.WriteString(fmt.Sprintf("// %s 对应.api文件中的%s接口\n", method.Handler, method.Handler))
+			buf.WriteString(fmt.Sprintf("func (c *%sClient) %s(ctx context.Context, req %s) (*%s, error) {\n",
+				service.Name, method.Handler, method.Request, method.Response))
 
-				// 提取查询参数
-				queryParams := extractQueryParams(method.Path)
-				for _, param := range queryParams {
-					paramName := strings.Split(param, "=")[0]
-					buf.WriteString(fmt.Sprintf("\n	if req.%s != \"\" {", paramName))
-					buf.WriteString(fmt.Sprintf("\n		query.Add(\"%s\", req.%s)", paramName, paramName))
-					buf.WriteString("\n	}")
+			// 3. 构建URL（拼接path参数）
+			buf.WriteString("	fullURL := fmt.Sprintf(\"%s%s\", c.domain, \"")
+			pathTemplate := method.Path
+			for _, field := range pathParams {
+				// 提取path标签的参数名（如 `path:"name"` 中的 "name"）
+				paramKey := extractTagValue(field.Tag, "path")
+				if paramKey == "" {
+					paramKey = field.Name // 默认使用字段名
 				}
-
-				buf.WriteString("\n	if len(query) > 0 {")
-				buf.WriteString("\n		url += \"?\" + query.Encode()")
-				buf.WriteString("\n	}")
+				// 替换路径中的占位符（如 /v1/user/:name -> /v1/user/"+req.Name）
+				pathTemplate = strings.ReplaceAll(pathTemplate, ":"+paramKey, "\" + req."+field.Name+" + \"")
 			}
+			buf.WriteString(pathTemplate + "\")\n")
 
-			// 创建HTTP请求
-			buf.WriteString(fmt.Sprintf("\n\n	// 创建HTTP %s请求\n", method.HTTPMethod))
-
-			if method.HTTPMethod == "GET" || method.HTTPMethod == "DELETE" {
-				buf.WriteString(fmt.Sprintf("	reqObj, err := http.NewRequest(\"%s\", url, nil)\n", method.HTTPMethod))
-			} else {
-				buf.WriteString("	var reqBody []byte\n")
-				buf.WriteString("	if req != nil {\n")
-				buf.WriteString("		reqBody, err = json.Marshal(req)\n")
-				buf.WriteString("		if err != nil {\n")
-				buf.WriteString("			return nil, err\n")
-				buf.WriteString("		}\n")
+			// 4. 处理form参数（拼接为查询字符串）
+			if len(formParams) > 0 {
+				buf.WriteString("\n	// 处理form参数（查询字符串）\n")
+				buf.WriteString("	query := url.Values{}\n")
+				for _, field := range formParams {
+					paramKey := extractTagValue(field.Tag, "form")
+					if paramKey == "" {
+						paramKey = field.Name
+					}
+					// 处理optional标记（可选参数）
+					if strings.Contains(field.Tag, "optional") {
+						buf.WriteString(fmt.Sprintf("	if req.%s != %v {\n", field.Name, getZeroValue(field.Type)))
+						buf.WriteString(fmt.Sprintf("		query.Add(\"%s\", fmt.Sprintf(\"%%v\", req.%s))\n", paramKey, field.Name))
+						buf.WriteString("	}\n")
+					} else {
+						buf.WriteString(fmt.Sprintf("	query.Add(\"%s\", fmt.Sprintf(\"%%v\", req.%s))\n", paramKey, field.Name))
+					}
+				}
+				buf.WriteString("	if len(query) > 0 {\n")
+				buf.WriteString("		fullURL += \"?\" + query.Encode()\n")
 				buf.WriteString("	}\n")
-				buf.WriteString(fmt.Sprintf("	reqObj, err := http.NewRequest(\"%s\", url, bytes.NewBuffer(reqBody))\n", method.HTTPMethod))
 			}
 
+			// 5. 创建HTTP请求（根据方法处理请求体）
+			httpMethod := strings.ToUpper(method.HTTPMethod)
+			buf.WriteString(fmt.Sprintf("\n	// 创建HTTP %s请求\n", httpMethod))
+
+			switch httpMethod {
+			case "GET", "DELETE":
+				// GET/DELETE 无请求体
+				buf.WriteString(fmt.Sprintf("	reqObj, err := http.NewRequestWithContext(ctx, \"%s\", fullURL, nil)\n", httpMethod))
+			case "POST", "PUT":
+				// POST/PUT 用json参数作为请求体
+				buf.WriteString("	reqBody, err := json.Marshal(req)\n")
+				buf.WriteString("	if err != nil {\n")
+				buf.WriteString("		return nil, err\n")
+				buf.WriteString("	}\n")
+				buf.WriteString(fmt.Sprintf("	reqObj, err := http.NewRequestWithContext(ctx, \"%s\", fullURL, bytes.NewBuffer(reqBody))\n", httpMethod))
+			}
+
+			// 检查请求创建错误
 			buf.WriteString("	if err != nil {\n")
-			buf.WriteString("		return nil, err\n")
+			buf.WriteString(fmt.Sprintf("		return nil, fmt.Errorf(\"failed to create %s request to %%s: %%w\", fullURL, err)\n", httpMethod))
 			buf.WriteString("	}\n")
 
-			// 设置请求头
-			buf.WriteString("\n	// 设置请求头\n")
-			buf.WriteString("	reqObj.Header.Set(\"Content-Type\", \"application/json\")\n")
+			// 6. 设置header参数
+			if len(headerParams) > 0 {
+				buf.WriteString("\n	// 设置header参数\n")
+				for _, field := range headerParams {
+					paramKey := extractTagValue(field.Tag, "header")
+					if paramKey == "" {
+						paramKey = field.Name
+					}
+					buf.WriteString(fmt.Sprintf("	reqObj.Header.Set(\"%s\", req.%s)\n", paramKey, field.Name))
+				}
+			}
 
-			// 发送请求
+			// 7. 设置Content-Type（POST/PUT默认json，GET/DELETE可选）
+			if httpMethod == "POST" || httpMethod == "PUT" {
+				buf.WriteString("\n	// 设置请求体类型\n")
+				buf.WriteString("	reqObj.Header.Set(\"Content-Type\", \"application/json\")\n")
+			}
+
+			// 8. 发送请求并处理响应（与之前逻辑一致）
 			buf.WriteString("\n	// 发送请求\n")
 			buf.WriteString("	resp, err := c.client.Do(reqObj)\n")
 			buf.WriteString("	if err != nil {\n")
@@ -399,7 +463,7 @@ func main() {
 	}
 	fmt.Println("begin read api file")
 	// 读取.api文件
-	content, err := ioutil.ReadFile(*apiFile)
+	content, err := os.ReadFile(*apiFile)
 	if err != nil {
 		fmt.Printf("Error reading file: %v\n", err)
 		return
@@ -427,12 +491,40 @@ func main() {
 		ext := filepath.Ext(baseName)
 		outputFile = strings.TrimSuffix(baseName, ext) + "_client.go"
 	}
-
-	err = ioutil.WriteFile(outputFile, clientCode, 0644)
+	outputDir := filepath.Dir(outputFile)
+	if err := os.MkdirAll(outputDir, 0755); err != nil {
+		fmt.Printf("Error creating directory: %v\n", err)
+		return
+	}
+	err = os.WriteFile(outputFile, clientCode, 0644)
 	if err != nil {
 		fmt.Printf("Error writing output file: %v\n", err)
 		return
 	}
 
 	fmt.Printf("Client code generated successfully: %s\n", outputFile)
+}
+
+// 辅助函数：获取类型的零值（用于optional参数判断）
+func getZeroValue(t string) string {
+	switch t {
+	case "string":
+		return "\"\""
+	case "bool":
+		return "false"
+	case "int", "int64", "float64":
+		return "0"
+	default:
+		return "\"\""
+	}
+}
+
+// 辅助函数：提取标签中的值（如 `header:"authorization"` 提取 "authorization"）
+func extractTagValue(tag, key string) string {
+	re := regexp.MustCompile(fmt.Sprintf(`%s:"([^",]+)`, key))
+	matches := re.FindStringSubmatch(tag)
+	if len(matches) > 1 {
+		return matches[1]
+	}
+	return ""
 }

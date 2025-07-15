@@ -3,11 +3,43 @@
 
 package types
 
-type Request struct {
-	Name        string `path:"name,options=[you,me]"` // parameters are auto validated
-	CreateTimes string `path:"time,options=[you,me]"`
+type AddUserRequest struct {
+	Authorization string `header:"authorization"`
+	Name          string `json:"name"`
+	Age           string `json:"age"`
 }
 
-type Response struct {
+type AddUserResponse struct {
+	Message string `json:"message"`
+}
+
+type DeleteUserRequest struct {
+	Authorization string `header:"authorization"`
+	Name          string `path:"name"`
+}
+
+type DeleteUserResponse struct {
+	Message string `json:"message"`
+}
+
+type GetUserRequest struct {
+	Authorization string `header:"authorization"`
+	Name          string `path:"name"`
+	Delete        bool   `form:"delete,optional"`
+}
+
+type GetUserResponse struct {
+	CreateTime string `json:"create_time"`
+	Name       string `json:"name"`
+	Age        string `json:"age"`
+}
+
+type UpdateUserRequest struct {
+	Authorization string `header:"authorization"`
+	Name          string `path:"name"`
+	Age           string `json:"age"`
+}
+
+type UpdateUserResponse struct {
 	Message string `json:"message"`
 }

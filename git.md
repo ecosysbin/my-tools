@@ -166,6 +166,3 @@ HEAD detached from origin/network-topology
 nothing to commit, working tree clean
 
 ```
-
-12. 所有的git提交都可以回退，是在不行就在web端找commit id，然后git reset
-git reset --hard c037540
